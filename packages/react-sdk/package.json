@@ -1,0 +1,17 @@
+{
+    "name": "@web3frame/react-sdk",
+    "version": "1.0.0",
+    "main": "build/index.js",
+    "types": "build/index.d.ts",
+    "scripts": {
+        "build:watch": "tsc -w"
+    },
+    "dependencies": {
+        "@types/react": "^16.8.23",
+        "@web3frame/core-sdk": "1.0.0",
+        "react": "^16.8.6"
+    },
+    "devDependencies": {
+        "typescript": "^3.5.3"
+    }
+}

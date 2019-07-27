@@ -1,0 +1,23 @@
+{
+  "private": true,
+  "name": "web3frame",
+  "version": "1.0.0",
+  "homepage": "https://github.com/joincivil/web3frame#readme",
+  "author": "Civil Media Company",
+  "license": "Apache 2.0",
+  "description": "",
+  "scripts": {
+    "watch": "lerna run --parallel build:watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joincivil/web3frame.git"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^3.15.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+    "private": true,
+    "name": "@web3frame/react-iframe",
+    "version": "1.0.0",
+  
+    "dependencies": {
+        "@web3frame/core-iframe": "1.0.0"
+    }
+  }
