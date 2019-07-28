@@ -1,8 +1,12 @@
 {
-    "name": "@web3frame/core-sdk",
-    "version": "1.0.0",
-  
-    "dependencies": {
-
-    }
+  "name": "@web3frame/core-sdk",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build:watch": "tsc -w"
+  },
+  "dependencies": {
+    "events": "^3.0.0"
   }
+}

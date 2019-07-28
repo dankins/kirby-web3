@@ -1,27 +1,24 @@
 import * as React from "react";
-import { Config } from "@web3frame/core-sdk";
+import { Config, Web3Frame, EventNames } from "@web3frame/core-sdk";
 
 export interface IWeb3FrameContext {
-  status: string;
-  loading: boolean;
-  config: Config;
+  web3frame: Web3Frame;
+  provider?: any;
 }
 
-type contextType = IWeb3FrameContext | null;
-
-export const Web3FrameContext = React.createContext<IWeb3FrameContext | null>(null);
+const web3frame = new Web3Frame();
+const startingContext: IWeb3FrameContext = { web3frame };
+export const Web3FrameContext = React.createContext<IWeb3FrameContext>(startingContext);
 
 export interface Web3FrameProviderProps {
   config: Config;
 }
 export const Web3FrameProvider: React.SFC<Web3FrameProviderProps> = ({ children, config }) => {
-  const [context, setContext] = React.useState<IWeb3FrameContext | null>(null);
+  const [context, setContext] = React.useState<IWeb3FrameContext>(startingContext);
 
-  if (!context) {
-    setContext({ config, status: "initialized", loading: false });
-  } else if (context.config != config) {
-    context.config = config;
-    setContext(context);
+  console.log("render", web3frame.config, config);
+  if (web3frame.config != config) {
+    initializeWeb3Frame(config, context, setContext);
   }
 
   return (
@@ -30,3 +27,17 @@ export const Web3FrameProvider: React.SFC<Web3FrameProviderProps> = ({ children,
     </>
   );
 };
+
+function initializeWeb3Frame(
+  config: Config,
+  currentContext: IWeb3FrameContext,
+  setContext: (ctx: IWeb3FrameContext) => void,
+) {
+  web3frame.initialize(config);
+  setContext({ web3frame });
+
+  web3frame.onNewProvider((provider: any) => {
+    console.log("new provider:", provider);
+    setContext({ ...currentContext, provider });
+  });
+}

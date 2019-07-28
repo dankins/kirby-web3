@@ -1,11 +1,16 @@
 import * as React from "react";
 
-import { Web3FrameProvider, IWeb3FrameContext, Web3FrameContext } from "@web3frame/react-sdk";
+import { Web3FrameProvider, Web3FrameContext, IWeb3FrameContext } from "@web3frame/react-sdk";
 
 const MyComponent = () => {
-  const ctx = React.useContext<IWeb3FrameContext | null>(Web3FrameContext);
+  const ctx = React.useContext<IWeb3FrameContext>(Web3FrameContext);
 
-  return <div>{ctx && ctx.config.foo}</div>;
+  return (
+    <div>
+      <div>config: {JSON.stringify(ctx.web3frame.config)}</div>
+      <div>provider: {ctx.provider && JSON.stringify(ctx.provider)}</div>
+    </div>
+  );
 };
 
 const config = {
