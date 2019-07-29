@@ -1,9 +1,11 @@
 import * as React from "react";
-import { Config, Web3Frame, EventNames } from "@web3frame/core-sdk";
+import { Config, Web3Frame } from "@web3frame/core-sdk";
 
 export interface IWeb3FrameContext {
   web3frame: Web3Frame;
-  provider?: any;
+  ethereum?: {
+    web3: any;
+  };
 }
 
 const web3frame = new Web3Frame();
@@ -34,10 +36,16 @@ function initializeWeb3Frame(
   setContext: (ctx: IWeb3FrameContext) => void,
 ) {
   web3frame.initialize(config);
-  setContext({ web3frame });
+  const nextContext: IWeb3FrameContext = { web3frame };
 
-  web3frame.onNewProvider((provider: any) => {
-    console.log("new provider:", provider);
-    setContext({ ...currentContext, provider });
-  });
+  if (config.ethereum) {
+    const ethereum = { web3: web3frame.ethereum!.web3 };
+    nextContext.ethereum = ethereum;
+    nextContext.web3frame.ethereum!.onNewWeb3((web3: any) => {
+      console.log("new web3:", web3);
+      const ethereum = { web3 };
+      setContext({ ...currentContext, ethereum });
+    });
+  }
+  setContext(nextContext);
 }

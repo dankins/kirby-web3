@@ -1,3 +1,7 @@
 export interface Config {
-  foo: string;
+  ethereum?: EthereumConfig;
+}
+
+export interface EthereumConfig {
+  readOnlyNodeURI: string;
 }

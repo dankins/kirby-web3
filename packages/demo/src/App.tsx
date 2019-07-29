@@ -5,16 +5,19 @@ import { Web3FrameProvider, Web3FrameContext, IWeb3FrameContext } from "@web3fra
 const MyComponent = () => {
   const ctx = React.useContext<IWeb3FrameContext>(Web3FrameContext);
 
+  console.log("ctx:", ctx);
   return (
     <div>
       <div>config: {JSON.stringify(ctx.web3frame.config)}</div>
-      <div>provider: {ctx.provider && JSON.stringify(ctx.provider)}</div>
+      <div>web3: {ctx.ethereum!.web3 ? "available" : "not available"}</div>
     </div>
   );
 };
 
 const config = {
-  foo: "bar",
+  ethereum: {
+    readOnlyNodeURI: process.env.REACT_APP_ETHEREUM_NODE!,
+  },
 };
 
 const App: React.FC = () => {

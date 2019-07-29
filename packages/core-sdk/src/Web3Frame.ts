@@ -1,5 +1,6 @@
 import { Config } from "./Config";
 import * as EventEmitter from "events";
+import { EthereumService } from "./ethereum/EthereumService";
 
 export enum Status {
   READY = "READY",
@@ -7,32 +8,28 @@ export enum Status {
   INITIALIZING = "INITIALIZING",
 }
 
-export enum EventNames {
-  NEW_PROVIDER = "NEW_PROVIDER",
-}
-
 export class Web3Frame {
   public config!: Config;
   public readonly: boolean;
   public status: Status;
 
-  public eventEmitter: EventEmitter;
+  private ee: EventEmitter;
+
+  public ethereum?: EthereumService;
 
   public constructor() {
     this.readonly = true;
     this.status = Status.NEW;
 
-    this.eventEmitter = new EventEmitter();
+    this.ee = new EventEmitter();
   }
 
   public async initialize(config: Config) {
     this.config = config;
     this.status = Status.INITIALIZING;
 
-    setTimeout(() => this.eventEmitter.emit(EventNames.NEW_PROVIDER, { gary: "coleman" }), 1000);
-  }
-
-  public onNewProvider(cb: (data: any) => void): void {
-    this.eventEmitter.on(EventNames.NEW_PROVIDER, cb);
+    if (this.config.ethereum) {
+      this.ethereum = new EthereumService(this.config.ethereum, this.ee);
+    }
   }
 }
