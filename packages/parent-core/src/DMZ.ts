@@ -1,5 +1,3 @@
-import { reject } from "q";
-
 // import { SDKMessage } from "@web3frame/core-messages";
 
 interface Subscribers {

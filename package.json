@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "web3frame",
+  "name": "kirby-web3",
   "version": "1.0.0",
-  "homepage": "https://github.com/joincivil/web3frame#readme",
+  "homepage": "https://github.com/joincivil/kirby-web3#readme",
   "author": "Civil Media Company",
   "license": "Apache 2.0",
   "description": "",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joincivil/web3frame.git"
+    "url": "git+https://github.com/joincivil/kirby-web3.git"
   },
   "workspaces": [
     "packages/*"

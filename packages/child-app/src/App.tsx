@@ -1,5 +1,5 @@
 import React from "react";
-import { WindowMessageHandler } from "@web3frame/core-iframe";
+import { WindowMessageHandler } from "@kirby-web3/child-core";
 
 console.log("hello from demo-iframe");
 

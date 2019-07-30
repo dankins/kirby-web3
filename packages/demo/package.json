@@ -1,5 +1,5 @@
 {
-  "name": "@web3frame/demo",
+  "name": "@kirby-web3/demo",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -7,7 +7,7 @@
     "@types/node": "12.6.8",
     "@types/react": "16.8.23",
     "@types/react-dom": "16.8.5",
-    "@web3frame/react-sdk": "1.0.0",
+    "@kirby-web3/parent-react": "1.0.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Config, Web3Frame } from "@web3frame/core-sdk";
+import { Config, Web3Frame } from "@kirby-web3/parent-core";
 
 export interface IWeb3FrameContext {
   web3frame: Web3Frame;

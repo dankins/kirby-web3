@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Web3FrameProvider, Web3FrameContext, IWeb3FrameContext } from "@web3frame/react-sdk";
+import { Web3FrameProvider, Web3FrameContext, IWeb3FrameContext } from "@kirby-web3/parent-react";
 
 async function getAccounts(ctx: IWeb3FrameContext, setAccount: (acct: string) => void) {
   if (!ctx.web3frame.ethereum!.readonly) {

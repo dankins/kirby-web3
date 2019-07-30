@@ -1,8 +1,0 @@
-{
-    "name": "@web3frame/demo-iframe",
-    "version": "1.0.0",
-  
-    "dependencies": {
-        "@web3frame/react-iframe": "1.0.0"
-    }
-  }

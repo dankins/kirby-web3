@@ -1,5 +1,5 @@
 {
-    "name": "@web3frame/react-sdk",
+    "name": "@kirby-web3/parent-react",
     "version": "1.0.0",
     "main": "build/index.js",
     "types": "build/index.d.ts",
@@ -8,7 +8,7 @@
     },
     "dependencies": {
         "@types/react": "^16.8.23",
-        "@web3frame/core-sdk": "1.0.0",
+        "@kirby-web3/parent-core": "1.0.0",
         "react": "^16.8.6"
     },
     "devDependencies": {

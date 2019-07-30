@@ -1,6 +1,6 @@
 {
     "private": true,
-    "name": "@web3frame/react-iframe",
+    "name": "@kirby-web3/child-react",
     "version": "1.0.0",
     "main": "build/index.js",
     "types": "build/index.d.ts",
@@ -9,7 +9,7 @@
     },
     "dependencies": {
         "@types/react": "^16.8.23",
-        "@web3frame/core-iframe": "1.0.0",
+        "@kirby-web3/child-core": "1.0.0",
         "react": "^16.8.6"
     },
     "devDependencies": {

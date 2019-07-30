@@ -1,5 +1,5 @@
 {
-  "name": "@web3frame/core-messages",
+  "name": "@kirby-web3/messages",
   "version": "1.0.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
