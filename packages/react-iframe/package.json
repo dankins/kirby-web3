@@ -2,8 +2,17 @@
     "private": true,
     "name": "@web3frame/react-iframe",
     "version": "1.0.0",
-  
+    "main": "build/index.js",
+    "types": "build/index.d.ts",
+    "scripts": {
+        "build:watch": "tsc -w"
+    },
     "dependencies": {
-        "@web3frame/core-iframe": "1.0.0"
+        "@types/react": "^16.8.23",
+        "@web3frame/core-iframe": "1.0.0",
+        "react": "^16.8.6"
+    },
+    "devDependencies": {
+        "typescript": "^3.5.3"
     }
-  }
+}

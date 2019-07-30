@@ -1,5 +1,7 @@
 import { EthereumConfig } from "../Config";
 import { EventEmitter } from "events";
+import { ParentIFrameProvider } from "./ParentIFrameProvider";
+import { DMZ } from "../DMZ";
 
 // web3.js hates typescript *eyeroll*
 const WebWsProvider = require("web3-providers-ws");
@@ -11,12 +13,14 @@ export enum EthereumEvents {
 }
 
 export class EthereumService {
+  private dmz: DMZ;
   private config: EthereumConfig;
   private ee: EventEmitter;
   public web3: any;
   public readonly: boolean;
 
-  constructor(config: EthereumConfig, ee: EventEmitter) {
+  constructor(config: EthereumConfig, ee: EventEmitter, dmz: DMZ) {
+    this.dmz = dmz;
     this.config = config;
     this.ee = ee;
     this.readonly = true;
@@ -48,7 +52,8 @@ export class EthereumService {
       console.log("injected ethereum: ", win.ethereum);
       await win.ethereum.enable();
       this.readonly = false;
-      this.web3 = new Web3(win.ethereum);
+      const provider = new ParentIFrameProvider(this.dmz);
+      this.web3 = new Web3(provider);
       this.ee.emit(EthereumEvents.NEW_WEB3_INSTANCE, this.web3);
     } else {
       throw new Error("no injected web3 provided");

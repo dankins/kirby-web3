@@ -1,8 +1,14 @@
 {
     "name": "@web3frame/core-iframe",
     "version": "1.0.0",
-  
+    "main": "build/index.js",
+    "types": "build/index.d.ts",
+    "scripts": {
+      "build:watch": "tsc -w"
+    },
     "dependencies": {
-
+      "@web3frame/core-messages": "^1.0.0",
+      "web3": "^1.2.0",
+      "typescript": "^3.5.3"
     }
   }

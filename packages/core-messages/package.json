@@ -1,0 +1,12 @@
+{
+  "name": "@web3frame/core-messages",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build:watch": "tsc -w"
+  },
+  "dependencies": {
+
+  }
+}
