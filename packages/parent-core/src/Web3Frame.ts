@@ -9,6 +9,14 @@ export enum Status {
   INITIALIZING = "INITIALIZING",
 }
 
+/*
+
+Web3Frame should probably be renamed to Kirby
+then we should have wrapper functions for things like "login"
+ - calling login would trigger "sign" on the EthereumService 
+
+ */
+
 export class Web3Frame {
   public config!: Config;
   public readonly: boolean;

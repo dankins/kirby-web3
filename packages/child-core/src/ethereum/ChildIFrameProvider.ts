@@ -23,6 +23,16 @@ export class ChildIFrameProvider {
   public handleIFrameMessage(req: any): Promise<void> {
     return new Promise((resolve, reject) => {
       console.log("WEB3_REQUEST", req);
+
+      /*
+        right here a web3 action comes in from the parent
+          let's say it's personal_sign
+          there should probably be a big switch that handles these
+          and passes them into dapparatus-core / burner provider / web3 connect
+          we will handle extra logic here too depending on permissions and autopilot etc
+
+       */
+
       this.provider[req.method](req.params, (err: any, data: any) => {
         if (err) {
           reject(err);

@@ -12,6 +12,13 @@ export enum EthereumEvents {
   NEW_WEB3_INSTANCE = "ETHEREUM_NEW_WEB3_INSTANCE",
 }
 
+/*
+
+  Kirby would call .sign on this class and it will send a message through to child.core
+  by calling personal.sign on ParentIFrameProvider
+
+ */
+
 export class EthereumService {
   private dmz: DMZ;
   private config: EthereumConfig;
