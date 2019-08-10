@@ -1,14 +1,15 @@
 {
-    "name": "@kirby-web3/child-core",
-    "version": "1.0.0",
-    "main": "build/index.js",
-    "types": "build/index.d.ts",
-    "scripts": {
-      "build:watch": "tsc -w"
-    },
-    "dependencies": {
-      "@kirby-web3/messages": "^1.0.0",
-      "web3": "^1.2.0",
-      "typescript": "^3.5.3"
-    }
+  "name": "@kirby-web3/child-core",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build:watch": "tsc -w"
+  },
+  "dependencies": {
+    "@kirby-web3/messages": "^1.0.0",
+    "dapparatus-core": "^1.0.1",
+    "typescript": "^3.5.3",
+    "web3": "^1.2.0"
   }
+}

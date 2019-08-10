@@ -8,6 +8,7 @@ async function getAccounts(ctx: IWeb3FrameContext, setAccount: (acct: string) =>
     console.log("accounts from ParentIFrameProvider:", accts);
     if (accts && accts.length > 0) {
       setAccount(accts[0]);
+      
     }
   }
 }
@@ -16,6 +17,8 @@ const MyComponent = () => {
   const ctx = React.useContext<IWeb3FrameContext>(Web3FrameContext);
 
   const [account, setAccount] = React.useState<string | null>(null);
+  const [sig, setSig] = React.useState<string | null>(null);
+  const [recovered, setRecovered] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     getAccounts(ctx, setAccount);
@@ -24,8 +27,18 @@ const MyComponent = () => {
   async function requestSign() {
     const accts = await ctx.web3frame.ethereum!.web3.eth.getAccounts();
     const web3 = ctx.web3frame.ethereum!.web3;
+    console.log("===> Calling sign....")
     const result = await web3.eth.personal.sign("hello", accts[0]);
     console.log("signature:", result);
+    setSig(result)
+  }
+
+  async function recoverAccount() {
+    const web3 = ctx.web3frame.ethereum!.web3;
+    console.log("===> Calling ecRecover....")
+    const result = await web3.eth.personal.ecRecover("hello", sig);
+    console.log("address:", result);
+    setRecovered(result)
   }
 
   console.log("ctx:", ctx);
@@ -39,6 +52,15 @@ const MyComponent = () => {
       </div>
       <div>
         {!ctx.web3frame.ethereum!.readonly ? <button onClick={async () => requestSign()}>web3 sign</button> : null}
+      </div>
+      <div>
+        {sig}
+      </div>
+      <div>
+        {!ctx.web3frame.ethereum!.readonly&&sig ? <button onClick={async () => recoverAccount()}>recover</button> : null}
+      </div>
+      <div>
+        {recovered}
       </div>
     </div>
   );
