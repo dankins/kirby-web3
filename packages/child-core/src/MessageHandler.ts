@@ -1,13 +1,18 @@
-import { ChildIFrameProvider } from "./ethereum/ChildIFrameProvider";
+import { Core } from "./Core";
 
-export abstract class MessageHandler {}
+export abstract class MessageHandler {
+  protected core: Core;
+  constructor(core: Core) {
+    this.core = core;
+  }
+}
 
 export class WindowMessageHandler extends MessageHandler {
   private parentURL: string;
-  private parentDomain!: string;
-  private ethereum: ChildIFrameProvider;
-  public constructor() {
-    super();
+  private parentDomain: string;
+
+  public constructor(core: Core) {
+    super(core);
     let parentDomain: string;
     const parentURL = window.location !== window.parent.location ? document.referrer : document.location.href;
     if (parentURL) {
@@ -15,11 +20,13 @@ export class WindowMessageHandler extends MessageHandler {
       if (match) {
         parentDomain = match[0];
         this.parentDomain = parentDomain;
+      } else {
+        throw new Error("could  determine parentDomain");
       }
+    } else {
+      throw new Error("could  determine parentDomain");
     }
-    this.ethereum = new ChildIFrameProvider((type, data) => {
-      parent.postMessage({ type, data }, "http://localhost:3001");
-    });
+
     console.log("WindowMessageHandler from parentUrl: ", parentURL);
     this.parentURL = parentURL;
 
@@ -37,12 +44,9 @@ export class WindowMessageHandler extends MessageHandler {
   public async handleMessage(message: any): Promise<void> {
     if (message.origin === this.parentDomain) {
       if (message.data.requestID) {
+        const data = await this.core.receiveMessage(message.data);
         const requestID = message.data.requestID;
-        await this.ethereum.initialize();
-        if (message.data.request.type === "WEB3_REQUEST") {
-          const data = await this.ethereum.handleIFrameMessage(message.data.request.data);
-          return parent.postMessage({ requestID: requestID, type: "RESPONSE", data }, "http://localhost:3001");
-        }
+        return parent.postMessage({ requestID: requestID, type: "RESPONSE", data }, "http://localhost:3001");
       }
     }
   }

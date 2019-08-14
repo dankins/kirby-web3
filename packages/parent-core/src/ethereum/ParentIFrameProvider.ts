@@ -1,8 +1,10 @@
 import { DMZ } from "../DMZ";
+import debug from "debug";
 
 export class ParentIFrameProvider {
   private host: string;
   private dmz: DMZ;
+  private logger = debug("kirby:parent:ParentIFrameProvider");
 
   constructor(dmz: DMZ) {
     this.host = "iframe";
@@ -16,15 +18,22 @@ export class ParentIFrameProvider {
 
   public registerEventListeners(): void {
     // return this.base.registerEventListeners();
-    console.log("calling registerEventListeners");
+    this.logger("calling registerEventListeners");
     return;
+  }
+
+  public async enable() {
+    console.group();
+    const response = await this.dmz.waitForChildInteraction({ type: "WEB3_ENABLE", data: {} });
+    this.logger("iframeMessage response", response.data);
+    console.groupEnd();
   }
 
   private async iframeMessage(method: string, callback?: (err: any, data: any) => any, ...params: any): Promise<any> {
     console.group();
-    console.log("iframeMessage request:", method, params);
+    this.logger("iframeMessage request:", method, params);
     const response = await this.dmz.send({ type: "WEB3_REQUEST", data: { method, params } });
-    console.log("iframeMessage response", response.data);
+    this.logger("iframeMessage response", response.data);
     console.groupEnd();
     if (callback) {
       try {
