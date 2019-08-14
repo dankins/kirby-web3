@@ -1,8 +1,8 @@
-import { Core } from "./Core";
+import { ChildCore } from "./ChildCore";
 
 export abstract class MessageHandler {
-  protected core: Core;
-  constructor(core: Core) {
+  protected core: ChildCore;
+  constructor(core: ChildCore) {
     this.core = core;
   }
 }
@@ -11,7 +11,7 @@ export class WindowMessageHandler extends MessageHandler {
   private parentURL: string;
   private parentDomain: string;
 
-  public constructor(core: Core) {
+  public constructor(core: ChildCore) {
     super(core);
     let parentDomain: string;
     const parentURL = window.location !== window.parent.location ? document.referrer : document.location.href;

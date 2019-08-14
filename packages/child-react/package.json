@@ -5,7 +5,9 @@
     "main": "build/index.js",
     "types": "build/index.d.ts",
     "scripts": {
-        "build:watch": "tsc -w"
+        "build:watch": "tsc -w",
+        "build": "tsc",
+        "clean": "rimraf ./build"
     },
     "dependencies": {
         "@kirby-web3/child-core": "1.0.0",

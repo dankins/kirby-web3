@@ -1,56 +1,87 @@
-import { EthereumConfig } from "../Config";
-import { EventEmitter } from "events";
 import { ParentIFrameProvider } from "./ParentIFrameProvider";
+import { ParentPlugin } from "../ParentPlugin";
 import { DMZ } from "../DMZ";
+import { Action } from "redux";
 
 // web3.js hates typescript *eyeroll*
 const WebWsProvider = require("web3-providers-ws");
 const Web3HttpProvider = require("web3-providers-http");
 const Web3 = require("web3");
 
-export enum EthereumEvents {
-  NEW_WEB3_INSTANCE = "ETHEREUM_NEW_WEB3_INSTANCE",
+// EthereumPlugin action types
+export const ETHEREUM_NEW_WEB3_INSTANCE = "ETHEREUM_NEW_WEB3_INSTANCE";
+export const ETHEREUM_ACCOUNT_CHANGE = "ETHEREUM_ACCOUNT_CHANGE";
+
+export interface EthereumPluginState {
+  readonly: boolean;
+  account?: string;
 }
 
-export class EthereumService {
-  private dmz: DMZ;
-  private config: EthereumConfig;
-  private ee: EventEmitter;
+export interface NewWeb3Instance {
+  type: typeof ETHEREUM_NEW_WEB3_INSTANCE;
+  payload: {
+    providerType: string;
+  };
+}
+
+export interface AccountChange {
+  type: typeof ETHEREUM_ACCOUNT_CHANGE;
+  payload: {
+    accounts: string[];
+  };
+}
+
+export type EthereumPluginActions = NewWeb3Instance | AccountChange;
+
+export interface Config {
+  readOnlyNodeURI: string;
+}
+
+export interface Dependencies {
+  dmz: DMZ;
+}
+
+export class EthereumService extends ParentPlugin<Config, Dependencies, EthereumPluginActions> {
+  public name = "ethereum";
+  public dependsOn = ["dmz"];
   public web3: any;
-  public readonly: boolean;
 
-  constructor(config: EthereumConfig, ee: EventEmitter, dmz: DMZ) {
-    this.dmz = dmz;
-    this.config = config;
-    this.ee = ee;
-    this.readonly = true;
-    this.initializeWeb3();
+  public reducer(state: EthereumPluginState = { readonly: true }, action: Action<any>): any {
+    if (action.type === ETHEREUM_NEW_WEB3_INSTANCE) {
+      return { ...state, readonly: false };
+    } else if (action.type === ETHEREUM_ACCOUNT_CHANGE) {
+      const tAction = action as AccountChange;
+      return { ...state, account: tAction.payload.accounts[0] };
+    }
+    return state;
   }
 
-  public onNewWeb3(cb: (data: any) => void): void {
-    this.ee.on(EthereumEvents.NEW_WEB3_INSTANCE, cb);
-  }
-
-  public initializeWeb3(): void {
+  public async startup(): Promise<void> {
     let readOnlyProvider;
     if (this.config.readOnlyNodeURI.startsWith("ws")) {
       readOnlyProvider = new WebWsProvider(this.config.readOnlyNodeURI);
-      this.readonly = true;
+      // this.readonly = true;
     } else if (this.config.readOnlyNodeURI.startsWith("http")) {
       readOnlyProvider = new Web3HttpProvider(this.config.readOnlyNodeURI);
-      this.readonly = true;
+      // this.readonly = true;
     } else {
       throw new Error("could not initialize provider");
     }
     this.web3 = new Web3(readOnlyProvider);
-    this.ee.emit(EthereumEvents.NEW_WEB3_INSTANCE, this.web3);
   }
 
   public async requestSignerWeb3(): Promise<void> {
-    this.readonly = false;
-    const provider = new ParentIFrameProvider(this.dmz);
+    const provider = new ParentIFrameProvider(this.dependencies.dmz);
     await provider.enable();
     this.web3 = new Web3(provider);
-    this.ee.emit(EthereumEvents.NEW_WEB3_INSTANCE, this.web3);
+    this.dispatch({ type: ETHEREUM_NEW_WEB3_INSTANCE, payload: { providerType: "fixme" } });
+    await this.getAccounts();
+  }
+
+  public async getAccounts(): Promise<string[]> {
+    const accounts = await this.web3.eth.getAccounts();
+
+    this.dispatch({ type: ETHEREUM_ACCOUNT_CHANGE, payload: { accounts } });
+    return accounts;
   }
 }

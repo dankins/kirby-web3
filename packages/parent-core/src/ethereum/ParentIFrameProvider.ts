@@ -25,7 +25,7 @@ export class ParentIFrameProvider {
   public async enable() {
     console.group();
     const response = await this.dmz.waitForChildInteraction({ type: "WEB3_ENABLE", data: {} });
-    this.logger("iframeMessage response", response.data);
+    this.logger("iframeMessage response", response);
     console.groupEnd();
   }
 
@@ -33,11 +33,11 @@ export class ParentIFrameProvider {
     console.group();
     this.logger("iframeMessage request:", method, params);
     const response = await this.dmz.send({ type: "WEB3_REQUEST", data: { method, params } });
-    this.logger("iframeMessage response", response.data);
+    this.logger("iframeMessage response", response);
     console.groupEnd();
     if (callback) {
       try {
-        callback(null, response.data);
+        callback(null, response);
       } catch (err) {
         console.error("error in callback", err);
       }

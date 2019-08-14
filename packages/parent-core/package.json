@@ -4,10 +4,12 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "build:watch": "tsc -w"
+    "build:watch": "tsc -w",
+    "build": "tsc",
+    "clean": "rimraf ./build"
   },
   "dependencies": {
-    "@kirby-web3/messages": "^1.0.0",
+    "@kirby-web3/common": "^1.0.0",
     "debug": "^4.1.1",
     "events": "^3.0.0",
     "web3": "^1.2.0",

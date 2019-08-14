@@ -8,6 +8,8 @@
   "description": "",
   "scripts": {
     "watch": "lerna run --parallel build:watch",
+    "clean": "lerna run clean --parallel",
+    "build": "lerna run build --sort",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

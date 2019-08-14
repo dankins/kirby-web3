@@ -4,12 +4,16 @@
     "main": "build/index.js",
     "types": "build/index.d.ts",
     "scripts": {
-        "build:watch": "tsc -w"
+        "build:watch": "tsc -w",
+        "build": "tsc",
+        "clean": "rimraf ./build"
     },
     "dependencies": {
-        "@types/react": "^16.8.23",
         "@kirby-web3/parent-core": "1.0.0",
-        "react": "^16.8.6"
+        "@types/react": "^16.8.23",
+        "@types/react-redux": "^7.1.1",
+        "react": "^16.8.6",
+        "react-redux": "^7.1.0"
     },
     "devDependencies": {
         "typescript": "^3.5.3"

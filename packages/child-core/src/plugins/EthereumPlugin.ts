@@ -1,11 +1,11 @@
-import { Plugin } from "../Plugin";
-import { ChildIFrameProvider } from "./ChildIFrameProvider";
+import { ChildIFrameProvider } from "../ethereum/ChildIFrameProvider";
 import * as Portis from "@portis/web3";
 import { MiddlewareAPI, Action } from "redux";
 import { Dispatch } from "react";
+import { ChildPlugin } from "../ChildPlugin";
 // import * as BurnerProvider from "burner-provider";
 
-export class EthereumPlugin extends Plugin {
+export class EthereumPlugin extends ChildPlugin<{}> {
   private provider!: ChildIFrameProvider;
   public name = "ethereum";
 
