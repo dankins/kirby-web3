@@ -1,14 +1,19 @@
 {
-    "name": "@kirby-web3/child-core",
-    "version": "1.0.0",
-    "main": "build/index.js",
-    "types": "build/index.d.ts",
-    "scripts": {
-      "build:watch": "tsc -w"
-    },
-    "dependencies": {
-      "@kirby-web3/messages": "^1.0.0",
-      "web3": "^1.2.0",
-      "typescript": "^3.5.3"
-    }
+  "name": "@kirby-web3/child-core",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build:watch": "tsc -w"
+  },
+  "dependencies": {
+    "@kirby-web3/messages": "^1.0.0",
+    "@portis/web3": "^2.0.0-beta.36",
+    "@types/debug": "^4.1.5",
+    "burner-provider": "^1.0.3",
+    "debug": "^4.1.1",
+    "redux": "^4.0.4",
+    "typescript": "^3.5.3",
+    "web3": "^1.2.0"
   }
+}
