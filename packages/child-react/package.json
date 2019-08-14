@@ -8,11 +8,17 @@
         "build:watch": "tsc -w"
     },
     "dependencies": {
-        "@types/react": "^16.8.23",
         "@kirby-web3/child-core": "1.0.0",
-        "react": "^16.8.6"
+        "@types/react": "^16.8.23",
+        "@types/react-redux": "^7.1.1",
+        "@types/styled-components": "^4.1.18",
+        "react": "^16.8.6",
+        "react-redux": "^7.1.0",
+        "react-svg": "^10.0.17",
+        "styled-components": "^4.3.2"
     },
     "devDependencies": {
+        "@svgr/cli": "^4.3.2",
         "typescript": "^3.5.3"
     }
 }

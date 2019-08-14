@@ -5,6 +5,7 @@
     "declaration": true,
     "declarationDir": "build/",
     "jsx": "react",
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": false,
     "lib": ["dom", "es2017"]
   },

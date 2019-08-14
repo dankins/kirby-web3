@@ -1,16 +1,20 @@
 import React from "react";
-import { WindowMessageHandler } from "@kirby-web3/child-core";
+import { EthereumPlugin } from "@kirby-web3/child-core";
+import { KirbyChildProvider, overrideTheme } from "@kirby-web3/child-react";
 
-console.log("hello from demo-iframe");
+import { Viewport } from "./viewport/Viewport";
 
-const handler = new WindowMessageHandler();
-console.log("iframe handler initialized", handler);
+const theme = overrideTheme({
+  headingFont: "Libre Franklin",
+});
+
+const plugins = [new EthereumPlugin()];
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <h1>hello, iframe</h1>
-    </div>
+    <KirbyChildProvider plugins={plugins} theme={theme}>
+      <Viewport />
+    </KirbyChildProvider>
   );
 };
 

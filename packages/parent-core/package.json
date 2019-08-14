@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@kirby-web3/messages": "^1.0.0",
+    "debug": "^4.1.1",
     "events": "^3.0.0",
     "web3": "^1.2.0",
     "web3-providers-http": "^1.2.0",

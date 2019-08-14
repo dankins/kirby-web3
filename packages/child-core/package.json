@@ -9,6 +9,11 @@
   "dependencies": {
     "@kirby-web3/messages": "^1.0.0",
     "dapparatus-core": "^1.0.1",
+    "@portis/web3": "^2.0.0-beta.36",
+    "@types/debug": "^4.1.5",
+    "burner-provider": "^1.0.3",
+    "debug": "^4.1.1",
+    "redux": "^4.0.4",
     "typescript": "^3.5.3",
     "web3": "^1.2.0"
   }
