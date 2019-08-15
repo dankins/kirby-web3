@@ -1,2 +1,3 @@
 export * from "./Kirby";
-export * from "./ethereum/EthereumService";
+export * from "./DMZ";
+export * from "./ParentPlugin";

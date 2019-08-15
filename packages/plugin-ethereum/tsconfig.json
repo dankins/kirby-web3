@@ -5,8 +5,8 @@
     "declaration": true,
     "declarationDir": "build/",
     "allowSyntheticDefaultImports": false,
-    "lib": ["dom", "es2017"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "lib": ["dom", "es2017"]
   },
   "include": ["./src/**/*.ts", "./src/**/*.tsx"]
 }

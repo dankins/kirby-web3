@@ -1,11 +1,11 @@
 import * as React from "react";
 
 import { KirbyProvider, KirbyContext, IKirbyContext, useSelector } from "@kirby-web3/parent-react";
-import { EthereumService } from "@kirby-web3/parent-core";
+import { EthereumParentPlugin } from "@kirby-web3/plugin-ethereum";
 
 const MyComponent = () => {
   const ctx = React.useContext<IKirbyContext>(KirbyContext);
-  const ethereumPlugin = ctx.kirby.plugins.ethereum as EthereumService;
+  const ethereumPlugin = ctx.kirby.plugins.ethereum as EthereumParentPlugin;
 
   const kirbyData = useSelector((state: any) => {
     return {

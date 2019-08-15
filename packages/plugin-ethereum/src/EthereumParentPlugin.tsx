@@ -1,7 +1,6 @@
 import { ParentIFrameProvider } from "./ParentIFrameProvider";
-import { ParentPlugin } from "../ParentPlugin";
-import { DMZ } from "../DMZ";
 import { Action } from "redux";
+import { ParentPlugin, DMZ } from "@kirby-web3/parent-core";
 
 // web3.js hates typescript *eyeroll*
 const WebWsProvider = require("web3-providers-ws");
@@ -41,7 +40,7 @@ export interface Dependencies {
   dmz: DMZ;
 }
 
-export class EthereumService extends ParentPlugin<Config, Dependencies, EthereumPluginActions> {
+export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, EthereumPluginActions> {
   public name = "ethereum";
   public dependsOn = ["dmz"];
   public web3: any;
