@@ -14,11 +14,14 @@ const MyComponent = () => {
     };
   });
 
+  const [sig, setSig] = React.useState("");
+
   async function requestSign() {
     const accts = await ethereumPlugin.getAccounts();
     const web3 = ethereumPlugin.web3;
     const result = await web3.eth.personal.sign("hello", accts[0]);
     console.log("signature:", result);
+    setSig(result);
   }
 
   return (
@@ -29,6 +32,7 @@ const MyComponent = () => {
         <button onClick={async () => ethereumPlugin.requestSignerWeb3()}>request signer web3 </button>
       </div>
       <div>{!kirbyData.readonly ? <button onClick={async () => requestSign()}>web3 sign</button> : null}</div>
+      <div>{sig}</div>
     </div>
   );
 };
