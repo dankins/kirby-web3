@@ -1,29 +1,18 @@
 import { Plugin } from "./Plugin";
-import {
-  createStore,
-  Store,
-  combineReducers,
-  applyMiddleware,
-  Middleware,
-  AnyAction,
-  MiddlewareAPI,
-  Action,
-} from "redux";
+import { createStore, Store, combineReducers, applyMiddleware } from "redux";
 
 import debug from "debug";
-import { Dispatch } from "react";
-import { ParentHandler } from "./plugins/ParentHandler";
 const logger = debug("kirby:core");
 debug.enable("kirby:*");
 
-export class Core {
-  private pluginList: Plugin[];
+export abstract class Core<P extends Plugin<any>> {
+  private pluginList: P[];
   private logger = logger;
   public redux: Store;
-  public plugins: { [key: string]: Plugin } = {};
+  public plugins: { [key: string]: P } = {};
 
-  constructor(plugins: Plugin[]) {
-    this.pluginList = ([new ParentHandler()] as Plugin[]).concat(plugins);
+  constructor(managerPlugin: P, plugins: P[]) {
+    this.pluginList = [managerPlugin].concat(plugins);
     const reducers: { [key: string]: any } = {};
     let middleware: any = [];
     this.pluginList.map(plugin => {
@@ -38,9 +27,11 @@ export class Core {
     this.redux = createStore(combineReducers(reducers), applyMiddleware(...middleware));
   }
 
-  public async initialize(): Promise<void> {
+  public async initialize(config: any): Promise<void> {
     this.logger("initializing plugins");
-    await Promise.all(this.pluginList.map(p => p.initialize(this.redux.dispatch, this.redux.getState)));
+    await Promise.all(
+      this.pluginList.map(p => p.initialize(this.plugins, this.redux.dispatch, this.redux.getState, config[p.name])),
+    );
     this.logger("initialized plugins");
   }
 
@@ -49,7 +40,7 @@ export class Core {
     this.redux.dispatch(message.request);
   }
 
-  public getPlugins(): { [key: string]: Plugin } {
+  public getPlugins(): { [key: string]: P } {
     return this.plugins;
   }
 }

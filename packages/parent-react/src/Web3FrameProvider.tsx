@@ -1,51 +1,44 @@
 import * as React from "react";
-import { Config, Web3Frame } from "@kirby-web3/parent-core";
+import { Kirby, EthereumService } from "@kirby-web3/parent-core";
+import { Provider, ReactReduxContextValue, useStore, useDispatch, useSelector } from "react-redux";
+import { AnyAction } from "redux";
 
-export interface IWeb3FrameContext {
-  web3frame: Web3Frame;
-  ethereum?: {
-    web3: any;
-  };
+export interface IKirbyContext extends ReactReduxContextValue<any, AnyAction> {
+  kirby: Kirby;
 }
 
-const web3frame = new Web3Frame();
-const startingContext: IWeb3FrameContext = { web3frame };
-export const Web3FrameContext = React.createContext<IWeb3FrameContext>(startingContext);
+const kirby = new Kirby([new EthereumService()]);
+const startingContext: IKirbyContext = { kirby, store: kirby.redux, storeState: {} };
+export const KirbyContext = React.createContext(startingContext);
 
-export interface Web3FrameProviderProps {
-  config: Config;
+// @ts-ignore
+export const KirbyReduxContext = React.createContext<ReactReduxContextValue<any, AnyAction>>(null);
+
+// TODO(dankins): if people are using redux this is going to conflict
+// https://react-redux.js.org/next/api/hooks#custom-context
+// redux#next has the hooks to create a context-aware store, but is not released yet
+
+// export const useStore = createStoreHook(KirbyReduxContext);
+// export const useDispatch = createDispatchHook(KirbyReduxContext);
+// export const useSelector = createSelectorHook(KirbyReduxContext);
+// TOOD(dankins): reexporting these for now, but this is bad
+export { useSelector, useStore, useDispatch };
+
+export interface KirbyProviderProps {
+  config: any;
 }
-export const Web3FrameProvider: React.SFC<Web3FrameProviderProps> = ({ children, config }) => {
-  const [context, setContext] = React.useState<IWeb3FrameContext>(startingContext);
+export const KirbyProvider: React.SFC<KirbyProviderProps> = ({ children, config }) => {
+  const [context, _] = React.useState<IKirbyContext>(startingContext);
 
-  console.log("render", web3frame.config, config);
-  if (web3frame.config != config) {
-    initializeWeb3Frame(config, context, setContext);
-  }
+  React.useMemo(() => {
+    kirby.initialize(config);
+  }, [config]);
 
   return (
     <>
-      <Web3FrameContext.Provider value={context}>{children}</Web3FrameContext.Provider>
+      <KirbyContext.Provider value={context}>
+        <Provider store={kirby.redux}>{children}</Provider>
+      </KirbyContext.Provider>
     </>
   );
 };
-
-function initializeWeb3Frame(
-  config: Config,
-  currentContext: IWeb3FrameContext,
-  setContext: (ctx: IWeb3FrameContext) => void,
-) {
-  web3frame.initialize(config);
-  const nextContext: IWeb3FrameContext = { web3frame };
-
-  if (config.ethereum) {
-    const ethereum = { web3: web3frame.ethereum!.web3 };
-    nextContext.ethereum = ethereum;
-    nextContext.web3frame.ethereum!.onNewWeb3((web3: any) => {
-      console.log("new web3:", web3);
-      const ethereum = { web3 };
-      setContext({ ...currentContext, ethereum });
-    });
-  }
-  setContext(nextContext);
-}

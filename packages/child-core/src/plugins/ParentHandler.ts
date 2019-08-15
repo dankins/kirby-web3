@@ -1,8 +1,8 @@
-import { Plugin } from "../Plugin";
 import { MiddlewareAPI, Action } from "redux";
 import { Dispatch } from "react";
+import { ChildPlugin } from "../ChildPlugin";
 
-export class ParentHandler extends Plugin {
+export class ParentHandler extends ChildPlugin {
   public name = "parent";
   public parentDomain: string;
 
@@ -42,7 +42,7 @@ export class ParentHandler extends Plugin {
   }
 
   public middleware = (api: MiddlewareAPI<any, any>) => (next: Dispatch<any>) => <A extends Action<any>>(
-    action: A,
+    action: any,
   ): void => {
     if (action.type === "PARENT_RESPONSE") {
       console.log("sending response to parent", action, api.getState());

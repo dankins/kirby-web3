@@ -1,4 +1,4 @@
 export * from "./MessageHandler";
-export * from "./Core";
-export * from "./Plugin";
+export * from "./ChildCore";
+export * from "./ChildPlugin";
 export * from "./plugins/EthereumPlugin";
