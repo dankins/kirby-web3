@@ -12,6 +12,7 @@
     "@types/debug": "^4.1.5",
     "debug": "^4.1.1",
     "redux": "^4.0.4",
+    "redux-dynamic-middlewares": "^1.0.0",
     "typescript": "^3.5.3"
   }
 }

@@ -90,19 +90,21 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
     if (action.type === RECEIVED_CHILD_MESSAGE) {
       const message = (action as ReceivedChildMessage).payload;
       const requestID = message.requestID;
-      const subscriber = this.subscribers[requestID];
-      this.logger("received a child message", requestID, subscriber);
-      subscriber.map(async (sub, idx) => {
-        try {
-          const result = await sub.callback(message.data);
-          sub.resolve ? sub.resolve(result) : undefined;
-          delete subscriber[idx];
-        } catch (err) {
-          console.error("error", err);
-          sub.reject(err);
-        }
-      });
-      delete this.subscribers[requestID];
+      if (requestID) {
+        const subscriber = this.subscribers[requestID];
+        this.logger("received a child message", requestID, subscriber);
+        subscriber.map(async (sub, idx) => {
+          try {
+            const result = await sub.callback(message.data);
+            sub.resolve ? sub.resolve(result) : undefined;
+            delete subscriber[idx];
+          } catch (err) {
+            console.error("error", err);
+            sub.reject(err);
+          }
+        });
+        delete this.subscribers[requestID];
+      }
 
       // this.sendToParent(action.requestID, {});
     }
@@ -126,6 +128,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
     this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.HIDDEN });
   }
   public async send(message: any): Promise<any> {
+    this.showChild();
     if (!this.iframe) {
       this.logger("not ready to send");
       return Promise.reject("not ready to send - iframe not available yet");
@@ -135,12 +138,12 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
     this.iframe!.postMessage({ requestID, request: message }, this.config.targetOrigin);
     return this.waitForResponse(requestID, response => {
       this.logger(`RESPONSE`, requestID, response);
+      this.hideChild();
       return response;
     });
   }
 
   public async waitForChildInteraction(message: any): Promise<any> {
-    this.showChild();
     try {
       const response = await this.send(message);
       this.hideChild();

@@ -1,18 +1,27 @@
 import { Plugin } from "./Plugin";
 import { createStore, Store, combineReducers, applyMiddleware } from "redux";
+import { default as dynamicMiddlewares, resetMiddlewares, addMiddleware } from "redux-dynamic-middlewares";
+import {} from "redux-dynamic-middlewares";
 
 import debug from "debug";
 const logger = debug("kirby:core");
 debug.enable("kirby:*");
 
 export abstract class Core<P extends Plugin<any>> {
-  private pluginList: P[];
+  private pluginList!: P[];
   private logger = logger;
-  public redux: Store;
+  public redux!: Store;
   public plugins: { [key: string]: P } = {};
 
-  constructor(managerPlugin: P, plugins: P[]) {
-    this.pluginList = [managerPlugin].concat(plugins);
+  public constructor() {
+    this.redux = createStore((state: any = {}, action: any) => state, applyMiddleware(dynamicMiddlewares));
+  }
+
+  public abstract defaultPlugins(): P[];
+
+  public async initialize(plugins: P[], config: any): Promise<void> {
+    const defaultPlugins = this.defaultPlugins();
+    this.pluginList = defaultPlugins.concat(plugins);
     const reducers: { [key: string]: any } = {};
     let middleware: any = [];
     this.pluginList.map(plugin => {
@@ -24,10 +33,10 @@ export abstract class Core<P extends Plugin<any>> {
       }
     }, {});
 
-    this.redux = createStore(combineReducers(reducers), applyMiddleware(...middleware));
-  }
+    this.redux.replaceReducer(combineReducers(reducers));
+    resetMiddlewares();
+    addMiddleware(...middleware);
 
-  public async initialize(config: any): Promise<void> {
     this.logger("initializing plugins");
     await Promise.all(
       this.pluginList.map(p => p.initialize(this.plugins, this.redux.dispatch, this.redux.getState, config[p.name])),
