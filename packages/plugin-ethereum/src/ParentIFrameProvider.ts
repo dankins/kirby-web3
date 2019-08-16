@@ -1,5 +1,5 @@
-import { DMZ } from "../DMZ";
 import debug from "debug";
+import { DMZ } from "@kirby-web3/parent-core";
 
 export class ParentIFrameProvider {
   private host: string;

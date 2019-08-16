@@ -11,8 +11,11 @@ export abstract class Plugin<C = undefined, D = any, A extends AnyAction = any> 
   public getState: any;
   public config!: C;
 
-  public constructor() {
+  public constructor(config?: C) {
     this.logger = debug("kirby:plugins");
+    if (config) {
+      this.config = config;
+    }
   }
 
   public middleware?: any;
@@ -26,7 +29,10 @@ export abstract class Plugin<C = undefined, D = any, A extends AnyAction = any> 
     this.logger = debug("kirby:plugins:" + this.name);
     this.dispatch = dispatch;
     this.getState = getState;
-    this.config = config;
+    if (config) {
+      this.config = config;
+    }
+
     this.dependencies = {};
     this.dependsOn.forEach(key => {
       this.dependencies[key] = plugins[key];

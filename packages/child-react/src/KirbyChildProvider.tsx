@@ -17,11 +17,11 @@ export const KirbyChildProvider: React.FC<KirbyChildProviderProps> = ({ plugins,
   const [loading, setLoading] = React.useState();
 
   React.useMemo(() => {
-    const newCore = new ChildCore(plugins);
+    const newCore = new ChildCore();
     setLoading(true);
     setCore(newCore);
     setStore(newCore.redux);
-    newCore.initialize({}).then(() => {
+    newCore.initialize(plugins, {}).then(() => {
       setLoading(false);
     });
   }, [plugins]);

@@ -1,12 +1,12 @@
 import * as React from "react";
 import { LogInWithMetaMask, LogInWithPortis, LogInWithBurner, CoreContext } from "@kirby-web3/child-react";
-import { EthereumPlugin } from "@kirby-web3/child-core";
+import { EthereumChildPlugin } from "@kirby-web3/plugin-ethereum";
 
 export const Web3Enable: React.FC = () => {
   const maybeCore = React.useContext(CoreContext);
   function selection(provider: string) {
     console.log("selected:", provider);
-    (maybeCore!.plugins.ethereum as EthereumPlugin).enableWeb3(provider);
+    (maybeCore!.plugins.ethereum as EthereumChildPlugin).enableWeb3(provider);
   }
   return (
     <div>

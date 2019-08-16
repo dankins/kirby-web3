@@ -2,13 +2,12 @@ import * as React from "react";
 import { Kirby, ParentPlugin } from "@kirby-web3/parent-core";
 import { Provider, ReactReduxContextValue, useStore, useDispatch, useSelector } from "react-redux";
 import { AnyAction } from "redux";
-import { EthereumParentPlugin } from "@kirby-web3/plugin-ethereum";
 
 export interface IKirbyContext extends ReactReduxContextValue<any, AnyAction> {
   kirby: Kirby;
 }
 
-const kirby = new Kirby([new EthereumParentPlugin()]);
+const kirby = new Kirby();
 const startingContext: IKirbyContext = { kirby, store: kirby.redux, storeState: {} };
 export const KirbyContext = React.createContext(startingContext);
 
@@ -33,8 +32,8 @@ export const KirbyProvider: React.SFC<KirbyProviderProps> = ({ plugins, children
   const [context, _] = React.useState<IKirbyContext>(startingContext);
 
   React.useMemo(() => {
-    kirby.initialize(config);
-  }, [config, plugins]);
+    kirby.initialize(plugins, config);
+  }, [plugins, config]);
 
   return (
     <>

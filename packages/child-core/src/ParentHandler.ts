@@ -1,6 +1,6 @@
 import { MiddlewareAPI, Action } from "redux";
 import { Dispatch } from "react";
-import { ChildPlugin } from "../ChildPlugin";
+import { ChildPlugin } from "./ChildPlugin";
 
 export class ParentHandler extends ChildPlugin {
   public name = "parent";

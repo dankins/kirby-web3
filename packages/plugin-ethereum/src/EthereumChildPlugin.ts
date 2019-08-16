@@ -1,11 +1,19 @@
-import { ChildIFrameProvider } from "../ethereum/ChildIFrameProvider";
+import { ChildIFrameProvider } from "./ChildIFrameProvider";
 import * as Portis from "@portis/web3";
 import { MiddlewareAPI, Action } from "redux";
 import { Dispatch } from "react";
-import { ChildPlugin } from "../ChildPlugin";
-// import * as BurnerProvider from "burner-provider";
+import { ChildPlugin } from "@kirby-web3/child-core";
+import * as BurnerProvider from "burner-provider";
 
-export class EthereumPlugin extends ChildPlugin<{}> {
+export interface EthereumChildPluginConfig {
+  network: "mainnet" | "rinkeby" | "ropsten";
+  rpcURL: string;
+  portis?: {
+    appID: string;
+  };
+}
+
+export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> {
   private provider!: ChildIFrameProvider;
   public name = "ethereum";
 
@@ -45,11 +53,11 @@ export class EthereumPlugin extends ChildPlugin<{}> {
         throw new Error("no injected web3 provided");
       }
     } else if (provider === "Portis") {
-      const portis = new Portis("1a382335-7ba0-4834-a3cd-dd1eff365f98", "mainnet");
+      const portis = new Portis(this.config.portis!.appID, this.config.network);
       await this.provider.setConcreteProvider(portis.provider);
     } else if (provider === "Burner Wallet") {
-      //const burnerProvider = new BurnerProvider("https://mainnet.infura.io/v3/06b8a36891d649ffa92950aeac5a7874");
-      // await this.provider.setConcreteProvider(burnerProvider);
+      const burnerProvider = new BurnerProvider(this.config.rpcURL);
+      await this.provider.setConcreteProvider(burnerProvider);
     } else {
       throw new Error("unrecognized provider");
     }

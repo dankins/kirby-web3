@@ -3543,10 +3543,10 @@ builtins@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/builtins/-/builtins-1.0.3.tgz#cb94faeb61c8696451db36534e1422f94f0aee88"
 
-burner-provider@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/burner-provider/-/burner-provider-1.0.3.tgz#9ff7fd77b58bb86dcfe4dc7ffe69619627466db4"
-  integrity sha512-iL2jN6TL0NjGXD5lWwQqsg9lgPQWSDyTtQi56Uav/nWdajOCqEY/uBdn5piG2M1fCSdWXHim0c06qcxAXOpRRQ==
+burner-provider@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/burner-provider/-/burner-provider-1.0.5.tgz#77868493d77deecafb2acce20a500149ee705444"
+  integrity sha512-/dTxJRy6egusXhGwMuOc44tKD9A0U3eG7UlFwJeYCJ8VrRtDsNUMlJW4ob0v3ff2iu2UD8XV1OswDtQA67Gy+w==
   dependencies:
     web3 "^1.2.0"
     web3-provider-engine "^15.0.0"
@@ -10720,6 +10720,11 @@ redent@^2.0.0:
   dependencies:
     indent-string "^3.0.0"
     strip-indent "^2.0.0"
+
+redux-dynamic-middlewares@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/redux-dynamic-middlewares/-/redux-dynamic-middlewares-1.0.0.tgz#a4c5859a6018a1d7fab3bdd4989f51095c806d15"
+  integrity sha512-smX1eY17dH90FVtXL6JPW01on1ptP4SOlkDYON5Lka52RNcZfgWM6hvtoZKA3O+dZL2/ytbS+tHo2gdKln5iHw==
 
 redux@^4.0.0, redux@^4.0.4:
   version "4.0.4"

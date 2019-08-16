@@ -1,7 +1,7 @@
 import * as React from "react";
-
 import { KirbyProvider, KirbyContext, IKirbyContext, useSelector } from "@kirby-web3/parent-react";
 import { EthereumParentPlugin } from "@kirby-web3/plugin-ethereum";
+import { ParentPlugin } from "@kirby-web3/parent-core";
 
 const MyComponent = () => {
   const ctx = React.useContext<IKirbyContext>(KirbyContext);
@@ -43,10 +43,12 @@ const config = {
   },
 };
 
+const plugins: ParentPlugin<any, any, any>[] = [new EthereumParentPlugin()];
+
 const App: React.FC = () => {
   return (
     <div className="App">
-      <KirbyProvider config={config}>
+      <KirbyProvider plugins={plugins} config={config}>
         <MyComponent />
       </KirbyProvider>
     </div>

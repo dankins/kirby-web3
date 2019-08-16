@@ -1,6 +1,6 @@
 import React from "react";
-import { EthereumPlugin } from "@kirby-web3/child-core";
 import { KirbyChildProvider, overrideTheme } from "@kirby-web3/child-react";
+import { EthereumChildPlugin } from "@kirby-web3/plugin-ethereum";
 
 import { Viewport } from "./viewport/Viewport";
 
@@ -8,7 +8,15 @@ const theme = overrideTheme({
   headingFont: "Libre Franklin",
 });
 
-const plugins = [new EthereumPlugin()];
+const plugins = [
+  new EthereumChildPlugin({
+    rpcURL: "https://mainnet.infura.io/v3/06b8a36891d649ffa92950aeac5a7874",
+    network: "mainnet",
+    portis: {
+      appID: "1a382335-7ba0-4834-a3cd-dd1eff365f98",
+    },
+  }),
+];
 
 const App: React.FC = () => {
   return (
