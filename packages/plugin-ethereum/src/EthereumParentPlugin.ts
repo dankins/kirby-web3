@@ -1,7 +1,7 @@
 import { ParentIFrameProvider } from "./ParentIFrameProvider";
-import { ParentPlugin } from "../ParentPlugin";
-import { DMZ } from "../DMZ";
-import { Action } from "redux";
+import { Action, MiddlewareAPI } from "redux";
+import { ParentPlugin, DMZ, RECEIVED_CHILD_MESSAGE } from "@kirby-web3/parent-core";
+import { Dispatch } from "react";
 
 // web3.js hates typescript *eyeroll*
 const WebWsProvider = require("web3-providers-ws");
@@ -41,10 +41,19 @@ export interface Dependencies {
   dmz: DMZ;
 }
 
-export class EthereumService extends ParentPlugin<Config, Dependencies, EthereumPluginActions> {
+export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, EthereumPluginActions> {
   public name = "ethereum";
   public dependsOn = ["dmz"];
   public web3: any;
+
+  public middleware = (api: MiddlewareAPI<any, any>) => (next: Dispatch<any>) => <A extends Action<any>>(
+    action: any,
+  ): void => {
+    if (action.type === RECEIVED_CHILD_MESSAGE && action.payload.data.requestType === "WEB3_ENABLE") {
+      this.dispatch({ type: ETHEREUM_NEW_WEB3_INSTANCE, payload: { providerType: action.payload.providerType } });
+    }
+    next(action);
+  };
 
   public reducer(state: EthereumPluginState = { readonly: true }, action: Action<any>): any {
     if (action.type === ETHEREUM_NEW_WEB3_INSTANCE) {
@@ -74,7 +83,6 @@ export class EthereumService extends ParentPlugin<Config, Dependencies, Ethereum
     const provider = new ParentIFrameProvider(this.dependencies.dmz);
     await provider.enable();
     this.web3 = new Web3(provider);
-    this.dispatch({ type: ETHEREUM_NEW_WEB3_INSTANCE, payload: { providerType: "fixme" } });
     await this.getAccounts();
   }
 

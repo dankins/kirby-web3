@@ -15,6 +15,7 @@ export class ChildIFrameProvider {
   public handleIFrameMessage(req: any): Promise<void> {
     return new Promise((resolve, reject) => {
       this.logger("WEB3_REQUEST", req, this.provider);
+      req.method = this.provider.sendAsync ? "sendAsync" : "send";
       this.provider[req.method](req.params, (err: any, data: any) => {
         if (err) {
           reject(err);

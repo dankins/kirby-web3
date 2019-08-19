@@ -1,6 +1,6 @@
 import { MiddlewareAPI, Action } from "redux";
 import { Dispatch } from "react";
-import { ChildPlugin } from "../ChildPlugin";
+import { ChildPlugin } from "./ChildPlugin";
 
 export class ParentHandler extends ChildPlugin {
   public name = "parent";
@@ -45,22 +45,26 @@ export class ParentHandler extends ChildPlugin {
     action: any,
   ): void => {
     if (action.type === "PARENT_RESPONSE") {
-      console.log("sending response to parent", action, api.getState());
-      this.sendToParent(action.requestID, {});
+      console.log("sending response to parent", action.requestID, action.payload);
+      this.sendToParent(action.requestID, action.payload);
     }
     next(action);
   };
 
-  public reducer(state: any = { pending: [] }, message: any): any {
+  public reducer(state: any = { pending: [] }, action: any): any {
     // this.logger("reduce", state, message);
     // return this.provider.handleIFrameMessage(message.request.data);
-    this.logger("got a message", message);
+    this.logger("got an action", action);
 
-    switch (message.type) {
+    switch (action.type) {
       case "PARENT_REQUEST":
-        return { ...state, pending: { ...state.pending, [message.requestID]: message } };
+        return { ...state, pending: { ...state.pending, [action.requestID]: action } };
     }
 
     return state;
+  }
+
+  public sendToParent(requestID: number, data: any): void {
+    parent.postMessage({ requestID: requestID, type: "RESPONSE", data }, "http://localhost:3001");
   }
 }

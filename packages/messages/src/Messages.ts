@@ -1,5 +1,0 @@
-export type SDKMessage = string;
-
-export enum SDKMessageTypes {
-  LOCKBOX_CONFIRM_DEVICE_ACTIVATION_REQUEST = "LOCKBOX_CONFIRM_DEVICE_ACTIVATION_REQUEST",
-}

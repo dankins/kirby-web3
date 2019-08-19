@@ -1,8 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
-import { useSelector } from "react-redux";
+import { Router } from "@reach/router";
 
 import { Web3Enable } from "../views/Web3Enable";
+import { SignatureConfirm } from "../views/SignatureConfirm";
 
 const StyledDiv = styled.div`
   padding: 10px 10px 25px 10px;
@@ -20,31 +21,13 @@ const StyledDiv = styled.div`
   }
 `;
 
-function viewSelector(state: any): any {
-  if (state.ethereum.web3EnableRequestID) {
-    return "web3Enable";
-  }
-
-  return null;
-}
-
 export const Viewport: React.FC = ({ children }) => {
-  const selectedView = useSelector(viewSelector);
-
-  let view: JSX.Element = <span />;
-  switch (selectedView) {
-    case "web3Enable":
-      view = <Web3Enable />;
-      break;
-  }
-
-  if (view === null) {
-    return null;
-  }
-
   return (
     <StyledDiv>
-      <div>{view}</div>
+      <Router>
+        <Web3Enable path="/ethereum/web3enable" />
+        <SignatureConfirm path="/ethereum/confirm-signature" />
+      </Router>
     </StyledDiv>
   );
 };
