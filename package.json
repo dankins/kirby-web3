@@ -7,6 +7,7 @@
   "license": "Apache 2.0",
   "description": "",
   "scripts": {
+    "lint": "lerna run lint --parallel",
     "watch": "lerna run --parallel build:watch",
     "clean": "lerna run clean --parallel",
     "build": "lerna run build --sort",
@@ -31,8 +32,7 @@
     "lerna": "^3.15.0",
     "multi-semantic-release": "^1.1.0",
     "netlify-cli": "^2.12.0",
-    "prettier": "^1.18.2",
-    "typescript": "^3.5.3"
+    "prettier": "^1.18.2"
   },
   "resolutions": {
     "multi-semantic-release/jest": "24.8.0"

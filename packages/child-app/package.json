@@ -15,9 +15,10 @@
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",
     "react-scripts": "3.1.1",
-    "typescript": "3.5.3"
+    "redux": "^4.0.4"
   },
   "scripts": {
+    "lint": "tslint --project ./",
     "start": "PORT=3002 react-scripts start",
     "build": "CI=false react-scripts build",
     "test": "react-scripts test",
@@ -37,5 +38,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "typescript": "^3.5.3"
   }
 }

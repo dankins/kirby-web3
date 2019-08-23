@@ -1,0 +1,8 @@
+{
+  "extends": ["../../tslint"],
+  "rules": {
+    "variable-name": [true, "ban-keywords", "allow-leading-underscore"],
+    "no-var-requires": false,
+    "whitespace": false
+  }
+}

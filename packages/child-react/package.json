@@ -5,6 +5,7 @@
     "main": "build/index.js",
     "types": "build/index.d.ts",
     "scripts": {
+        "lint": "tslint --project ./",
         "build:watch": "tsc -w",
         "build": "tsc",
         "clean": "rimraf ./build"
@@ -15,12 +16,12 @@
         "@types/react-redux": "^7.1.1",
         "@types/styled-components": "^4.1.18",
         "react": "^16.8.6",
+        "react-dom": "^16.8.6",
         "react-redux": "^7.1.0",
         "react-svg": "^10.0.17",
         "styled-components": "^4.3.2"
     },
     "devDependencies": {
-        "@svgr/cli": "^4.3.2",
         "typescript": "^3.5.3"
     }
 }

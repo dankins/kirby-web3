@@ -1,9 +1,8 @@
 import * as React from "react";
 import { Kirby, ParentPlugin } from "@kirby-web3/parent-core";
 import { Provider, ReactReduxContextValue, useStore, useDispatch, useSelector } from "react-redux";
-import { AnyAction } from "redux";
 
-export interface IKirbyContext extends ReactReduxContextValue<any, AnyAction> {
+export interface IKirbyContext extends ReactReduxContextValue {
   kirby: Kirby;
 }
 
@@ -12,7 +11,7 @@ const startingContext: IKirbyContext = { kirby, store: kirby.redux, storeState: 
 export const KirbyContext = React.createContext(startingContext);
 
 // @ts-ignore
-export const KirbyReduxContext = React.createContext<ReactReduxContextValue<any, AnyAction>>(null);
+export const KirbyReduxContext = React.createContext<ReactReduxContextValue>(null);
 
 // TODO(dankins): if people are using redux this is going to conflict
 // https://react-redux.js.org/next/api/hooks#custom-context
@@ -28,7 +27,7 @@ export interface KirbyProviderProps {
   config: any;
   plugins: ParentPlugin[];
 }
-export const KirbyProvider: React.SFC<KirbyProviderProps> = ({ plugins, children, config }) => {
+export const KirbyProvider: React.FunctionComponent<KirbyProviderProps> = ({ plugins, children, config }) => {
   const [context, _] = React.useState<IKirbyContext>(startingContext);
 
   React.useMemo(() => {

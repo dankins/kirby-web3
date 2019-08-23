@@ -1,6 +1,5 @@
 import { ParentPlugin } from "./ParentPlugin";
-import { MiddlewareAPI, Action } from "redux";
-import { Dispatch } from "react";
+import { MiddlewareAPI, Action, Dispatch } from "redux";
 
 // redux action types
 export const RECEIVED_CHILD_MESSAGE = "RECEIVED_CHILD_MESSAGE";
@@ -13,7 +12,7 @@ export enum IFrameStatus {
 }
 
 interface Subscribers {
-  [key: string]: Array<{ resolve?: any; reject?: any; callback: (data: any) => void }>;
+  [key: string]: Array<{ resolve?: any; reject?: any; callback(data: any): void }>;
 }
 
 export interface ReceivedChildMessage {
@@ -37,16 +36,12 @@ export interface DMZConfig {
   iframeSrc: string;
 }
 
-let requestID = 0;
-function generateRequestID(): number {
-  return requestID + 1;
-}
-
 export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   public name = "dmz";
   private iframe?: Window;
   private iframeElement!: HTMLIFrameElement;
   private subscribers: Subscribers = { READY: [] };
+  private nextRequestID = 0;
 
   public async startup(): Promise<void> {
     this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.LOADING });
@@ -77,16 +72,14 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
     body.appendChild(iframe);
   }
 
-  public reducer(state: any = {}, action: DMZMessageType) {
+  public reducer(state: any = {}, action: DMZMessageType): any {
     if (action.type === IFRAME_STATUS_CHANGE) {
       return { ...state, status: action.payload };
     }
     return state;
   }
 
-  public middleware = (api: MiddlewareAPI<any, any>) => (next: Dispatch<any>) => <A extends Action<any>>(
-    action: any,
-  ): void => {
+  public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.type === RECEIVED_CHILD_MESSAGE) {
       const message = (action as ReceivedChildMessage).payload;
       const requestID = message.requestID;
@@ -113,9 +106,9 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
 
   public async showChild(): Promise<any> {
     const style = `
-    border: none; 
-    position: absolute; 
-    top: 0px; 
+    border: none;
+    position: absolute;
+    top: 0px;
     right: 0px;
     width: 100%;
     height: 100%;
@@ -133,7 +126,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
       this.logger("not ready to send");
       return Promise.reject("not ready to send - iframe not available yet");
     }
-    const requestID = generateRequestID();
+    const requestID = this.generateRequestID();
     this.logger(`SEND ${message.type}`, this.iframe);
     this.iframe!.postMessage({ requestID, request: message }, this.config.targetOrigin);
     return this.waitForResponse(requestID, response => {
@@ -179,5 +172,10 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
         payload: message.data,
       });
     }
+  }
+
+  private generateRequestID(): number {
+    this.nextRequestID++;
+    return this.nextRequestID;
   }
 }

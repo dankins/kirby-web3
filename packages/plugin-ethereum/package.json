@@ -4,6 +4,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
+    "lint": "tslint --project ./",
     "build:watch": "tsc -w",
     "build": "tsc",
     "clean": "rimraf ./build"
