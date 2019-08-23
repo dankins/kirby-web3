@@ -1,5 +1,5 @@
 {
-  "name": "child-app",
+  "name": "@kirby-web3/child-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
