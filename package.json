@@ -10,8 +10,10 @@
     "watch": "lerna run --parallel build:watch",
     "clean": "lerna run clean --parallel",
     "build": "lerna run build --sort",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "release": "multi-semantic-release"
+    "release": "multi-semantic-release",
+    "netlify:child-app": "netlify deploy --prod --dir packages/child-app/build  --site $NETLIFY_SITE_ID_CHILD_APP",
+    "test": "CI=true lerna run test --stream --sort",
+    "prettier": "prettier --config .prettierrc.yaml --write --list-different './**/*.{ts,tsx,json,md}'"
   },
   "repository": {
     "type": "git",
@@ -28,8 +30,12 @@
     "husky": "^3.0.4",
     "lerna": "^3.15.0",
     "multi-semantic-release": "^1.1.0",
+    "netlify-cli": "^2.12.0",
     "prettier": "^1.18.2",
     "typescript": "^3.5.3"
+  },
+  "resolutions": {
+    "multi-semantic-release/jest": "24.8.0"
   },
   "husky": {
     "hooks": {
