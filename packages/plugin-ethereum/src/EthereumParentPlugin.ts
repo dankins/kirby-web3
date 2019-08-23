@@ -1,12 +1,11 @@
 import { ParentIFrameProvider } from "./ParentIFrameProvider";
-import { Action, MiddlewareAPI } from "redux";
+import { Action, MiddlewareAPI, Dispatch } from "redux";
 import { ParentPlugin, DMZ, RECEIVED_CHILD_MESSAGE } from "@kirby-web3/parent-core";
-import { Dispatch } from "react";
 
 // web3.js hates typescript *eyeroll*
-const WebWsProvider = require("web3-providers-ws");
-const Web3HttpProvider = require("web3-providers-http");
-const Web3 = require("web3");
+import WebWsProvider = require("web3-providers-ws");
+import Web3HttpProvider = require("web3-providers-http");
+import Web3 = require("web3");
 
 // EthereumPlugin action types
 export const ETHEREUM_NEW_WEB3_INSTANCE = "ETHEREUM_NEW_WEB3_INSTANCE";
@@ -46,16 +45,14 @@ export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, Eth
   public dependsOn = ["dmz"];
   public web3: any;
 
-  public middleware = (api: MiddlewareAPI<any, any>) => (next: Dispatch<any>) => <A extends Action<any>>(
-    action: any,
-  ): void => {
+  public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.type === RECEIVED_CHILD_MESSAGE && action.payload.data.requestType === "WEB3_ENABLE") {
       this.dispatch({ type: ETHEREUM_NEW_WEB3_INSTANCE, payload: { providerType: action.payload.providerType } });
     }
     next(action);
   };
 
-  public reducer(state: EthereumPluginState = { readonly: true }, action: Action<any>): any {
+  public reducer(state: EthereumPluginState = { readonly: true }, action: Action): any {
     if (action.type === ETHEREUM_NEW_WEB3_INSTANCE) {
       return { ...state, readonly: false };
     } else if (action.type === ETHEREUM_ACCOUNT_CHANGE) {

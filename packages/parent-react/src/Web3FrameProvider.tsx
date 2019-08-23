@@ -31,7 +31,9 @@ export const KirbyProvider: React.FunctionComponent<KirbyProviderProps> = ({ plu
   const [context, _] = React.useState<IKirbyContext>(startingContext);
 
   React.useMemo(() => {
-    kirby.initialize(plugins, config);
+    kirby.initialize(plugins, config).catch(err => {
+      console.log("error initializing kirby!", err);
+    });
   }, [plugins, config]);
 
   return (

@@ -89,7 +89,9 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
         subscriber.map(async (sub, idx) => {
           try {
             const result = await sub.callback(message.data);
-            sub.resolve ? sub.resolve(result) : undefined;
+            if (sub.resolve) {
+              sub.resolve(result);
+            }
             delete subscriber[idx];
           } catch (err) {
             console.error("error", err);
@@ -104,7 +106,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
     next(action);
   };
 
-  public async showChild(): Promise<any> {
+  public showChild(): void {
     const style = `
     border: none;
     position: absolute;
@@ -116,7 +118,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
     this.iframeElement.setAttribute("style", style);
     this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.VISIBLE });
   }
-  public async hideChild(): Promise<any> {
+  public hideChild(): void {
     this.iframeElement.setAttribute("style", "display: none");
     this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.HIDDEN });
   }
@@ -147,7 +149,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
     }
   }
 
-  public waitForResponse(requestID: number, callback: (data?: any) => void): Promise<void> {
+  public async waitForResponse(requestID: number, callback: (data?: any) => void): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.subscribers[requestID]) {
         this.subscribers[requestID] = [];

@@ -10,9 +10,11 @@ export class ChildIFrameProvider {
     this.send = send;
   }
 
-  public async initialize(): Promise<void> {}
+  public async initialize(): Promise<void> {
+    return;
+  }
 
-  public handleIFrameMessage(req: any): Promise<void> {
+  public async handleIFrameMessage(req: any): Promise<void> {
     return new Promise((resolve, reject) => {
       this.logger("WEB3_REQUEST", req, this.provider);
       req.method = this.provider.sendAsync ? "sendAsync" : "send";
@@ -26,15 +28,15 @@ export class ChildIFrameProvider {
     });
   }
 
-  public async setConcreteProvider(provider: any) {
+  public async setConcreteProvider(provider: any): Promise<void> {
     this.provider = provider;
-    provider.on("data", this.handleOnEvent);
+    provider.on("data", (data: any) => this.handleOnEvent(data));
     if (provider.enable) {
       await provider.enable();
     }
   }
 
-  public handleOnEvent(data: any) {
+  public handleOnEvent(data: any): void {
     this.logger("handleOnEvent", data);
     this.send("WEB3_ON_DATA", data);
   }

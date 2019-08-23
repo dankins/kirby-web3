@@ -23,7 +23,7 @@ export interface CompleteViewAction {
 
 export type ViewPluginActions = RequestViewAction;
 
-export class ViewPlugin extends ChildPlugin<undefined, any, any> {
+export class ViewPlugin extends ChildPlugin {
   public name = "view";
 
   public reducer(state: any = { queue: [] }, action: any): any {
@@ -42,7 +42,7 @@ export class ViewPlugin extends ChildPlugin<undefined, any, any> {
     this.dispatch({ type: REQUEST_VIEW_ACTION, payload: { route, requestID, dispatchOnComplete } });
   }
 
-  public completeView() {
+  public completeView(): void {
     this.dispatch({ type: COMPLETE_VIEW_ACTION });
   }
 }

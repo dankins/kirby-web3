@@ -1,7 +1,6 @@
 import { ChildIFrameProvider } from "./ChildIFrameProvider";
 import * as Portis from "@portis/web3";
-import { MiddlewareAPI, Action } from "redux";
-import { Dispatch } from "react";
+import { MiddlewareAPI, Action, Dispatch } from "redux";
 import { ChildPlugin } from "@kirby-web3/child-core";
 import * as BurnerProvider from "burner-provider";
 import { REQUEST_VIEW_ACTION } from "@kirby-web3/child-core/build/ViewPlugin";
@@ -15,8 +14,8 @@ export interface EthereumChildPluginConfig {
 }
 
 export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> {
-  private provider!: ChildIFrameProvider;
   public name = "ethereum";
+  private provider!: ChildIFrameProvider;
 
   public async startup(): Promise<void> {
     this.provider = new ChildIFrameProvider((type, data) => {
@@ -25,14 +24,17 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     await this.provider.initialize();
   }
 
-  public middleware = (api: MiddlewareAPI<any, any>) => (next: Dispatch<any>) => <A extends Action<any>>(
-    action: any,
-  ): void => {
+  public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.type === "PARENT_REQUEST" && action.data.type === "WEB3_REQUEST") {
-      this.provider.handleIFrameMessage(action.data.data).then(response => {
-        this.logger("got a response", response);
-        this.dispatch({ type: "PARENT_RESPONSE", requestID: action.requestID, payload: response });
-      });
+      this.provider
+        .handleIFrameMessage(action.data.data)
+        .then(response => {
+          this.logger("got a response", response);
+          this.dispatch({ type: "PARENT_RESPONSE", requestID: action.requestID, payload: response });
+        })
+        .catch(err => {
+          this.logger("middleware error: ", err);
+        });
     } else if (action.type === "PARENT_REQUEST" && action.data.type === "WEB3_ENABLE") {
       this.dispatch({
         type: REQUEST_VIEW_ACTION,

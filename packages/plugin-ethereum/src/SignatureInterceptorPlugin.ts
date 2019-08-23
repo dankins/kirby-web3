@@ -1,6 +1,5 @@
 import { ChildPlugin } from "@kirby-web3/child-core";
-import { MiddlewareAPI, Action } from "redux";
-import { Dispatch } from "react";
+import { MiddlewareAPI, Action, Dispatch } from "redux";
 import { REQUEST_VIEW_ACTION } from "@kirby-web3/child-core/build/ViewPlugin";
 import * as webUtils from "web3-utils";
 
@@ -21,9 +20,7 @@ export class SignatureInterceptorPlugin extends ChildPlugin<SignatureInterceptor
   public name = "signatureInterceptor";
   public dependsOn = ["ethereum"];
 
-  public middleware = (api: MiddlewareAPI<any, any>) => (next: Dispatch<any>) => <A extends Action<any>>(
-    action: any,
-  ): void => {
+  public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.doNotIntercept || this.config.autoSign) {
       next(action);
     } else if (isSignatureRequest(action)) {
@@ -54,13 +51,13 @@ export class SignatureInterceptorPlugin extends ChildPlugin<SignatureInterceptor
     return state;
   }
 
-  public approveAction() {
+  public approveAction(): void {
     const originalAction = this.getState().signatureInterceptor.originalAction;
     this.dispatch(originalAction);
   }
 
-  public rejectAction() {
+  public rejectAction(): void {
     const originalAction = this.getState().signatureInterceptor.originalAction;
-    this.dispatch({ type: "REJECTED_REQUEST", payload: { originalAction: originalAction } });
+    this.dispatch({ type: "REJECTED_REQUEST", payload: { originalAction } });
   }
 }

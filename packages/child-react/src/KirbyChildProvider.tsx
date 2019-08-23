@@ -6,7 +6,7 @@ import { Theme, DefaultTheme } from "./Theme";
 
 export interface KirbyChildProviderProps {
   theme?: Theme;
-  plugins: ChildPlugin<any>[];
+  plugins: ChildPlugin[];
 }
 
 export const CoreContext = React.createContext<ChildCore | null>(null);
@@ -21,9 +21,14 @@ export const KirbyChildProvider: React.FC<KirbyChildProviderProps> = ({ plugins,
     setLoading(true);
     setCore(newCore);
     setStore(newCore.redux);
-    newCore.initialize(plugins, {}).then(() => {
-      setLoading(false);
-    });
+    newCore
+      .initialize(plugins, {})
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log("error initialzing", err);
+      });
   }, [plugins]);
 
   return (

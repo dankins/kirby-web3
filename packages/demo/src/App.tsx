@@ -1,7 +1,6 @@
 import * as React from "react";
 import { KirbyProvider, KirbyContext, IKirbyContext, useSelector } from "@kirby-web3/parent-react";
 import { EthereumParentPlugin } from "@kirby-web3/plugin-ethereum";
-import { ParentPlugin } from "@kirby-web3/parent-core";
 
 const MyComponent = () => {
   const ctx = React.useContext<IKirbyContext>(KirbyContext);
@@ -14,11 +13,12 @@ const MyComponent = () => {
     };
   });
 
-  async function requestSign() {
+  async function requestSign(): Promise<any> {
     const accts = await ethereumPlugin.getAccounts();
     const web3 = ethereumPlugin.web3;
     const result = await web3.eth.personal.sign("hello", accts[0]);
     console.log("signature:", result);
+    return result;
   }
 
   return (
@@ -43,7 +43,7 @@ const config = {
   },
 };
 
-const plugins: ParentPlugin<any, any, any>[] = [new EthereumParentPlugin()];
+const plugins = [new EthereumParentPlugin()];
 
 const App: React.FC = () => {
   return (

@@ -1,5 +1,4 @@
-import { MiddlewareAPI, Action } from "redux";
-import { Dispatch } from "react";
+import { MiddlewareAPI, Action, Dispatch } from "redux";
 import { ChildPlugin } from "./ChildPlugin";
 
 export class ParentHandler extends ChildPlugin {
@@ -41,9 +40,7 @@ export class ParentHandler extends ChildPlugin {
     }
   }
 
-  public middleware = (api: MiddlewareAPI<any, any>) => (next: Dispatch<any>) => <A extends Action<any>>(
-    action: any,
-  ): void => {
+  public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.type === "PARENT_RESPONSE") {
       console.log("sending response to parent", action.requestID, action.payload);
       this.sendToParent(action.requestID, action.payload);
@@ -65,6 +62,6 @@ export class ParentHandler extends ChildPlugin {
   }
 
   public sendToParent(requestID: number, data: any): void {
-    parent.postMessage({ requestID: requestID, type: "RESPONSE", data }, "http://localhost:3001");
+    parent.postMessage({ requestID, type: "RESPONSE", data }, "http://localhost:3001");
   }
 }

@@ -12,9 +12,11 @@ export const Web3Enable: React.FC<RouteComponentProps> = () => {
       return state.view.queue[0].requestID;
     }
   });
-  function selection(provider: string) {
+  function selection(provider: string): void {
     console.log("selected:", provider);
-    (maybeCore!.plugins.ethereum as EthereumChildPlugin).enableWeb3(provider, requestID);
+    (maybeCore!.plugins.ethereum as EthereumChildPlugin).enableWeb3(provider, requestID).catch(err => {
+      console.log("error with enableWeb3: ", err);
+    });
     (maybeCore!.plugins.view as ViewPlugin).completeView();
   }
   return (

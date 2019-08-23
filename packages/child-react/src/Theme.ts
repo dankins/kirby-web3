@@ -1,7 +1,7 @@
 export interface Theme {
-  headingFont: String;
-  headingColor: String;
-  subHeadingColor: String;
+  headingFont: string;
+  headingColor: string;
+  subHeadingColor: string;
 }
 export const DefaultTheme: Theme = {
   headingFont: "arial",
@@ -9,6 +9,6 @@ export const DefaultTheme: Theme = {
   subHeadingColor: "#555555",
 };
 
-export const overrideTheme = function(input: Partial<Theme>): Theme {
+export const overrideTheme = (input: Partial<Theme>): Theme => {
   return { ...DefaultTheme, ...input };
 };

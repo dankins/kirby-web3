@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { SignatureInterceptorPlugin } from "@kirby-web3/plugin-ethereum";
 import { RouteComponentProps } from "@reach/router";
 
-export const SignatureConfirm: React.FC<RouteComponentProps> = () => {
+export const SignatureConfirm: React.FunctionComponent<RouteComponentProps> = () => {
   const maybeCore = React.useContext(CoreContext);
   const sig = maybeCore!.plugins.signatureInterceptor as SignatureInterceptorPlugin;
 
@@ -12,10 +12,10 @@ export const SignatureConfirm: React.FC<RouteComponentProps> = () => {
     return sig.getSignatureRequest();
   });
 
-  function approveAction() {
+  function approveAction(): void {
     sig.approveAction();
   }
-  function rejectAction() {
+  function rejectAction(): void {
     sig.rejectAction();
   }
   return (
@@ -23,8 +23,8 @@ export const SignatureConfirm: React.FC<RouteComponentProps> = () => {
       <small>signature requested:</small>
       <div>{kirbyData && kirbyData.plaintext}</div>
       <div>
-        <button onClick={() => approveAction()}>approve</button>
-        <button onClick={() => rejectAction()}>reject</button>
+        <button onClick={approveAction}>approve</button>
+        <button onClick={rejectAction}>reject</button>
       </div>
     </div>
   );

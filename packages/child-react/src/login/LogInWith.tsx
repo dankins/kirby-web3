@@ -27,7 +27,6 @@ const StyledDiv = styled.div`
     flex-grow: 1;
   }
 `;
-``;
 const OvalImage = styled.div`
   background-color: #f1f1f1;
   border-radius: 100%;
@@ -68,7 +67,7 @@ export interface ProviderProps {
 export const LogInWithMetaMask: React.FC<ProviderProps> = props => {
   return (
     <LogInWith
-      onSelection={props.onSelection}
+      onSelection={option => props.onSelection(option)}
       logo={<MetaMask />}
       provider={"MetaMask"}
       helpText="Use any MetaMask to log in."
@@ -79,7 +78,7 @@ export const LogInWithMetaMask: React.FC<ProviderProps> = props => {
 export const LogInWithPortis: React.FC<ProviderProps> = props => {
   return (
     <LogInWith
-      onSelection={props.onSelection}
+      onSelection={option => props.onSelection(option)}
       logo={<Portis />}
       provider={"Portis"}
       helpText="Use Portis to log in from any device."
@@ -90,7 +89,7 @@ export const LogInWithPortis: React.FC<ProviderProps> = props => {
 export const LogInWithBurner: React.FC<ProviderProps> = props => {
   return (
     <LogInWith
-      onSelection={props.onSelection}
+      onSelection={option => props.onSelection(option)}
       logo={<Burner />}
       provider={"Burner Wallet"}
       helpText="Use Burner Wallet for a temporary identity."

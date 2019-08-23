@@ -8,9 +8,7 @@ import { REQUEST_VIEW_ACTION, COMPLETE_VIEW_ACTION } from "@kirby-web3/child-cor
 export class ReachRouterPlugin extends ChildPlugin {
   public name = "reachRouter";
 
-  public middleware = (api: MiddlewareAPI<any, any>) => (next: Dispatch<any>) => <A extends Action<any>>(
-    action: any,
-  ): void => {
+  public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.type === REQUEST_VIEW_ACTION) {
       navigate(action.payload.route);
     }
