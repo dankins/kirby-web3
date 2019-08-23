@@ -41,8 +41,7 @@ jobs:
             - run:
                 name: Netlify - Child App
                 command: |
-                    yarn netlify:child-app
-                    
+                    if [ "$TESTVAR" = "master" ];  then yarn netlify:child-app; fi
 
 workflows:
     version: 2
