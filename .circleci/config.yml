@@ -38,6 +38,7 @@ jobs:
                 name: Releasing
                 command: |
                     sudo npm install -g multi-semantic-release
+                    
                     multi-semantic-release
             - run:
                 name: Netlify - Child App
