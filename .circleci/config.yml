@@ -37,7 +37,8 @@ jobs:
             - run:
                 name: Releasing
                 command: |
-                    yarn release
+                    sudo npm install -g multi-semantic-release
+                    multi-semantic-release
             - run:
                 name: Netlify - Child App
                 command: |
@@ -47,5 +48,4 @@ workflows:
     version: 2
     build-and-deploy:
         jobs:
-            - build:
-                context: gcp-common
+            - build

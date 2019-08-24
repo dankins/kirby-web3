@@ -1,5 +1,4 @@
 {
-    "private": true,
     "name": "@kirby-web3/child-react",
     "version": "1.0.0",
     "main": "build/index.js",
@@ -23,5 +22,8 @@
     },
     "devDependencies": {
         "typescript": "^3.5.3"
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }
