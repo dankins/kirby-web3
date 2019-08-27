@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Provider } from "react-redux";
+// @ts-ignore: @types/react-redux doesn't have create*Hook yet
+import { Provider, createStoreHook, createDispatchHook, createSelectorHook } from "react-redux";
 import { ThemeProvider } from "styled-components";
 import { ChildCore, ChildPlugin } from "@kirby-web3/child-core";
 import { Theme, DefaultTheme } from "./Theme";
@@ -7,37 +8,37 @@ import { Theme, DefaultTheme } from "./Theme";
 export interface KirbyChildProviderProps {
   theme?: Theme;
   plugins: ChildPlugin[];
+  config?: any;
 }
 
-export const CoreContext = React.createContext<ChildCore | null>(null);
+export interface ICoreContext {
+  core: ChildCore;
+  store: any;
+}
+const core = new ChildCore();
+const startingContext = { core, store: core.redux, storeState: {} };
+export const CoreContext = React.createContext<ICoreContext>(startingContext);
 
-export const KirbyChildProvider: React.FC<KirbyChildProviderProps> = ({ plugins, theme, children }) => {
-  const [core, setCore] = React.useState();
-  const [store, setStore] = React.useState();
-  const [loading, setLoading] = React.useState();
+export const useStore = createStoreHook(CoreContext);
+export const useDispatch = createDispatchHook(CoreContext);
+export const useSelector = createSelectorHook(CoreContext);
+
+export const KirbyChildProvider: React.FC<KirbyChildProviderProps> = ({ plugins, theme, children, config }) => {
+  const [context, _] = React.useState<ICoreContext>(startingContext);
 
   React.useMemo(() => {
-    const newCore = new ChildCore();
-    setLoading(true);
-    setCore(newCore);
-    setStore(newCore.redux);
-    newCore
-      .initialize(plugins, {})
-      .then(() => {
-        setLoading(false);
-      })
-      .catch(err => {
-        console.log("error initialzing", err);
-      });
-  }, [plugins]);
+    core.initialize(plugins, config || {}).catch(err => {
+      console.log("error initializing kirby!", err);
+    });
+  }, [plugins, config]);
 
   return (
     <ThemeProvider theme={theme || DefaultTheme}>
-      <Provider store={store}>
-        <CoreContext.Provider value={core}>
+      <CoreContext.Provider value={context}>
+        <Provider store={core.redux}>
           <div>{children}</div>
-        </CoreContext.Provider>
-      </Provider>
+        </Provider>
+      </CoreContext.Provider>
     </ThemeProvider>
   );
 };
