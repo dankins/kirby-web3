@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
-import { KirbyProvider, KirbyContext, IKirbyContext, useSelector } from "@kirby-web3/parent-react";
+import { KirbyProvider, KirbyContext, useSelector } from "@kirby-web3/parent-react";
 import { EthereumParentPlugin } from "@kirby-web3/plugin-ethereum";
 
 const config = {
@@ -16,9 +16,15 @@ const config = {
 const plugins = [new EthereumParentPlugin()];
 
 function App() {
-
   const ctx = React.useContext(KirbyContext);
   const ethereumPlugin = ctx.kirby.plugins.ethereum;
+
+  const kirbyData = useSelector((state) => {
+    return {
+      readonly: state.ethereum.readonly,
+      account: state.ethereum.account,
+    };
+  });
 
   return (
     <div className="App">
@@ -27,7 +33,7 @@ function App() {
           <Button onClick={async () => ethereumPlugin.requestSignerWeb3()} variant="primary" size="lg">Connect</Button>
         </div>
         <div style={{textAlign:"center", fontSize:28, width:"100%", marginTop:"30%"}}>
-          Demo legacy Kirby app.
+          Demo Kirby dApp.
         </div>
       </KirbyProvider>
     </div>
