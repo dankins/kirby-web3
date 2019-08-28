@@ -1,6 +1,6 @@
 import * as React from "react";
 // @ts-ignore: @types/react-redux doesn't have create*Hook yet
-import { Provider, createStoreHook, createDispatchHook, createSelectorHook } from "react-redux";
+import { Provider, createStoreHook, createDispatchHook, createSelectorHook, ReactReduxContextValue } from "react-redux";
 import { ThemeProvider } from "styled-components";
 import { ChildCore, ChildPlugin } from "@kirby-web3/child-core";
 import { Theme, DefaultTheme } from "./Theme";
@@ -11,12 +11,12 @@ export interface KirbyChildProviderProps {
   config?: any;
 }
 
-export interface ICoreContext {
+export interface ICoreContext extends ReactReduxContextValue {
   core: ChildCore;
-  store: any;
 }
 const core = new ChildCore();
 const startingContext = { core, store: core.redux, storeState: {} };
+export const ReduxContext = React.createContext<ReactReduxContextValue>(startingContext);
 export const CoreContext = React.createContext<ICoreContext>(startingContext);
 
 export const useStore = createStoreHook(CoreContext);
@@ -35,7 +35,7 @@ export const KirbyChildProvider: React.FC<KirbyChildProviderProps> = ({ plugins,
   return (
     <ThemeProvider theme={theme || DefaultTheme}>
       <CoreContext.Provider value={context}>
-        <Provider store={core.redux}>
+        <Provider context={ReduxContext} store={core.redux}>
           <div>{children}</div>
         </Provider>
       </CoreContext.Provider>

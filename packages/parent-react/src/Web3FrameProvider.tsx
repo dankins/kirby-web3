@@ -9,6 +9,7 @@ export interface IKirbyContext extends ReactReduxContextValue {
 
 const kirby = new Kirby();
 const startingContext: IKirbyContext = { kirby, store: kirby.redux, storeState: {} };
+export const ReduxContext = React.createContext<ReactReduxContextValue>(startingContext);
 export const KirbyContext = React.createContext(startingContext);
 
 export const useStore = createStoreHook(KirbyContext);
@@ -31,7 +32,9 @@ export const KirbyProvider: React.FunctionComponent<KirbyProviderProps> = ({ plu
   return (
     <>
       <KirbyContext.Provider value={context}>
-        <Provider store={kirby.redux}>{children}</Provider>
+        <Provider context={ReduxContext} store={kirby.redux}>
+          {children}
+        </Provider>
       </KirbyContext.Provider>
     </>
   );
