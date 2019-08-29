@@ -25,7 +25,8 @@ const MyComponent = () => {
 
   const [chainState, setChainState] = React.useState({
     network: "Unknown",
-    block: "loading..."
+    block: "loading...",
+    balance: 0
   });
 
   async function getWeb3Info(): Promise<any> {
@@ -36,12 +37,15 @@ const MyComponent = () => {
     console.log("network", network);
     const block = await web3.eth.getBlockNumber()
     console.log("block", block);
-    if (kirbyData.account) {
+    const accts = await ethereumPlugin.getAccounts();
+    console.log("checking balance ", accts)
+    let balance = 0
+    if (accts && accts.length>0) {
       console.log("getting balance...")
-      const balance = await web3.eth.getBalance(kirbyData.account)
+      balance = await web3.eth.getBalance(accts[0])
       console.log("balance", balance)
     }
-    setChainState({network, block})
+    setChainState({network, block, balance})
   }
 
   React.useEffect(() => {
@@ -53,6 +57,7 @@ const MyComponent = () => {
   console.log("state.ethereum", ctx.kirby.plugins.ethereum)
 
   let statusDisplay
+  let connectButton
   if (kirbyData.readonly) {
     statusDisplay = (
       <div>
@@ -72,6 +77,9 @@ const MyComponent = () => {
         </div>
       </div>
     )
+    connectButton = (
+      <Button onClick={async () => ethereumPlugin.requestSignerWeb3()} variant="primary" size="lg">Connect</Button>
+    )
   } else {
     statusDisplay = (
       <div>
@@ -83,8 +91,8 @@ const MyComponent = () => {
         </div>
         <div className="mainText">
           Your balance is
-          <span style={{color: "#FF8800", padding: 10}}>
-            {kirbyData.balance}
+          <span style={{color: "#00C851", padding: 10}}>
+            {chainState.balance}
           </span>
         </div>
         <div className="mainText">
@@ -92,22 +100,25 @@ const MyComponent = () => {
         </div>
       </div>
     )
+    connectButton = (
+      <Button onClick={async () => ethereumPlugin.requestSignerWeb3()} variant="success" size="lg">Connected</Button>
+    )
   }
-
+  
   return (
     <div>
       <div style={{position: "absolute", right: "5%", top: "3%"}}>
-        <Button onClick={async () => ethereumPlugin.requestSignerWeb3()} variant="primary" size="lg">Connect</Button>
+        {connectButton}
       </div>
 
       <div style={{marginTop: "20%"}}>
         <div className="mainText">
           Demo
-          <span style={{color: "#9933CC", padding: 10}}>
+          <span style={{color: "#ff4081", padding: 10}}>
             Kirby
           </span>
           dApp on the
-          <span style={{color: "#00695c", padding: 10}}>
+          <span style={{color: "#aa66cc", padding: 10}}>
             {chainState.network}
           </span>
           network
@@ -123,8 +134,6 @@ const MyComponent = () => {
         {statusDisplay}
 
       </div>
-
-      <div>{!kirbyData.readonly ? <button onClick={async () => requestSign()}>web3 sign</button> : null}</div>
     </div>
   );
 };
