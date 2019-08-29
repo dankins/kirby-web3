@@ -2,7 +2,7 @@ import { MiddlewareAPI, Action, Dispatch } from "redux";
 import { ChildPlugin } from "./ChildPlugin";
 
 export class ParentHandler extends ChildPlugin {
-  public name = "parent";
+  public name = "iframe";
   public parentDomain: string;
 
   public constructor() {
@@ -62,6 +62,6 @@ export class ParentHandler extends ChildPlugin {
   }
 
   public sendToParent(requestID: number, data: any): void {
-    parent.postMessage({ requestID, type: "RESPONSE", data }, "http://localhost:3001");
+    parent.postMessage({ requestID, type: "RESPONSE", data }, this.parentDomain);
   }
 }
