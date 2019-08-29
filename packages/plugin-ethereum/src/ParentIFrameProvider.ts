@@ -21,10 +21,8 @@ export class ParentIFrameProvider {
   }
 
   public async enable(): Promise<void> {
-    console.group();
     const response = await this.dmz.waitForChildInteraction({ type: "WEB3_ENABLE", data: {} });
     this.logger("iframeMessage response", response);
-    console.groupEnd();
   }
 
   public async send(data: any, cb: any): Promise<any> {
@@ -72,11 +70,9 @@ export class ParentIFrameProvider {
   }
 
   private async iframeMessage(method: string, callback?: (err: any, data: any) => any, ...params: any): Promise<any> {
-    console.group();
     this.logger("iframeMessage request:", method, params);
     const response = await this.dmz.send({ type: "WEB3_REQUEST", data: { method, params } });
     this.logger("iframeMessage response", response);
-    console.groupEnd();
     if (callback) {
       try {
         callback(null, response);
