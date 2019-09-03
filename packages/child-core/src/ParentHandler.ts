@@ -1,5 +1,14 @@
 import { MiddlewareAPI, Action, Dispatch } from "redux";
+import {
+  ChildToParentMessage,
+  CHILD_RESPONSE,
+  CHILD_SHOW_VIEW,
+  CHILD_ALIVE,
+  CHILD_HIDE_VIEW,
+  SEND_TO_PARENT,
+} from "@kirby-web3/common";
 import { ChildPlugin } from "./ChildPlugin";
+import { REQUEST_VIEW_ACTION, COMPLETE_VIEW_ACTION } from "./ViewPlugin";
 
 export class ParentHandler extends ChildPlugin {
   public name = "iframe";
@@ -26,6 +35,8 @@ export class ParentHandler extends ChildPlugin {
     } else {
       (window as any).attachEvent("onmessage", this.handleMessage.bind(this));
     }
+
+    this.sendToParent({ type: CHILD_ALIVE, payload: { provides: [] } });
   }
 
   public async handleMessage(message: any): Promise<void> {
@@ -42,8 +53,18 @@ export class ParentHandler extends ChildPlugin {
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.type === "PARENT_RESPONSE") {
-      console.log("sending response to parent", action.requestID, action.payload);
-      this.sendToParent(action.requestID, action.payload);
+      this.sendToParent({ type: CHILD_RESPONSE, requestID: action.requestID, payload: action.payload });
+    } else if (action.type === REQUEST_VIEW_ACTION) {
+      this.sendToParent({ type: CHILD_SHOW_VIEW, payload: {} });
+    } else if (action.type === COMPLETE_VIEW_ACTION) {
+      const queue = api.getState().view.queue;
+      this.logger("should we hide the view?", api.getState().view);
+      if (queue.length === 1) {
+        this.sendToParent({ type: CHILD_HIDE_VIEW, payload: {} });
+      }
+    } else if (action.type === SEND_TO_PARENT) {
+      console.log("SEND_TO_PARENT send to parent", action.payload);
+      this.sendToParent(action.payload);
     }
     next(action);
   };
@@ -61,7 +82,7 @@ export class ParentHandler extends ChildPlugin {
     return state;
   }
 
-  public sendToParent(requestID: number, data: any): void {
-    parent.postMessage({ requestID, type: "RESPONSE", data }, this.parentDomain);
+  public sendToParent(message: ChildToParentMessage): void {
+    parent.postMessage(message, this.parentDomain);
   }
 }

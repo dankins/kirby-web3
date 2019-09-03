@@ -4,7 +4,6 @@ import { DMZ } from "@kirby-web3/parent-core";
 export class ParentIFrameProvider {
   private dmz: DMZ;
   private logger = debug("kirby:parent:ParentIFrameProvider");
-
   constructor(dmz: DMZ) {
     this.dmz = dmz;
   }

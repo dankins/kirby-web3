@@ -1,14 +1,14 @@
 import { ParentPlugin } from "./ParentPlugin";
 import { MiddlewareAPI, Action, Dispatch } from "redux";
+import { CHILD_SHOW_VIEW, ChildToParentMessage, CHILD_RESPONSE, CHILD_HIDE_VIEW } from "@kirby-web3/common";
 
 // redux action types
-export const RECEIVED_CHILD_MESSAGE = "RECEIVED_CHILD_MESSAGE";
+export const MESSAGE_FROM_CHILD = "MESSAGE_FROM_CHILD";
 export const IFRAME_STATUS_CHANGE = "IFRAME_STATUS_CHANGE";
 export enum IFrameStatus {
   LOADING = "LOADING",
   ERROR = "ERROR",
-  HIDDEN = "HIDDEN",
-  VISIBLE = "VISIBLE",
+  READY = "READY",
 }
 
 interface Subscribers {
@@ -16,12 +16,8 @@ interface Subscribers {
 }
 
 export interface ReceivedChildMessage {
-  type: typeof RECEIVED_CHILD_MESSAGE;
-  payload: {
-    requestID: number;
-    type: string;
-    data: any; // TOOD(dankins): change this to payload to match?
-  };
+  type: typeof MESSAGE_FROM_CHILD;
+  payload: ChildToParentMessage;
 }
 
 export interface IFrameStatusChange {
@@ -42,6 +38,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   private iframeElement!: HTMLIFrameElement;
   private subscribers: Subscribers = { READY: [] };
   private nextRequestID = 0;
+  private startQueue: any[] = [];
 
   public async startup(): Promise<void> {
     this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.LOADING });
@@ -52,9 +49,10 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
     this.hideChild();
 
     iframe.onload = () => {
+      this.logger("iframe loaded");
       const contentWindow = (iframe as HTMLIFrameElement).contentWindow;
       this.iframe = contentWindow!;
-      this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.HIDDEN });
+      this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.READY });
     };
 
     iframe.onerror = () => {
@@ -80,60 +78,79 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   }
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
-    if (action.type === RECEIVED_CHILD_MESSAGE) {
-      const message = (action as ReceivedChildMessage).payload;
-      const requestID = message.requestID;
-      if (requestID) {
-        const subscriber = this.subscribers[requestID];
-        this.logger("received a child message", requestID, subscriber);
-        subscriber.map(async (sub, idx) => {
-          try {
-            const result = await sub.callback(message.data);
-            if (sub.resolve) {
-              sub.resolve(result);
+    if (action.type === MESSAGE_FROM_CHILD) {
+      const message = action.payload as ChildToParentMessage;
+      this.logger("received message from child", message);
+      switch (message.type) {
+        case CHILD_RESPONSE: {
+          this.logger("CHILD_RESPONSE", message);
+          const requestID = message.requestID;
+          const subscriber = this.subscribers[requestID];
+          subscriber.map(async (sub, idx) => {
+            try {
+              const result = await sub.callback(message.payload);
+              if (sub.resolve) {
+                sub.resolve(result);
+              }
+              delete subscriber[idx];
+            } catch (err) {
+              console.error("error", err);
+              sub.reject(err);
             }
-            delete subscriber[idx];
-          } catch (err) {
-            console.error("error", err);
-            sub.reject(err);
-          }
-        });
-        delete this.subscribers[requestID];
+          });
+          delete this.subscribers[requestID];
+          break;
+        }
+        case CHILD_SHOW_VIEW: {
+          this.showChild(message.payload);
+          break;
+        }
+        case CHILD_HIDE_VIEW: {
+          this.hideChild();
+          break;
+        }
       }
 
-      // this.sendToParent(action.requestID, {});
+      const subscribers = this.subscribers[message.type];
+      this.logger("subscribers: ", message.type, subscribers);
+      if (subscribers && subscribers.length > 0) {
+        subscribers.map(cb => cb.callback(message.payload));
+      }
+    } else if (action.type === IFRAME_STATUS_CHANGE && action.payload === IFrameStatus.READY) {
+      if (this.startQueue.length > 0) {
+        console.log("sending queued messages", action, this.startQueue, this.iframe);
+        this.startQueue.map(msg => this.iframe!.postMessage(msg, this.config.targetOrigin));
+      }
     }
     next(action);
   };
 
-  public showChild(): void {
+  public showChild(request: any): void {
     const style = `
     border: none;
-    position: absolute;
+    position: fixed;
     top: 0px;
     right: 0px;
-    width: 100%;
-    height: 100%;
+    width: 500px;
+    height: 1000px;
+    z-index: 10000000;
     `;
     this.iframeElement.setAttribute("style", style);
-    this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.VISIBLE });
   }
   public hideChild(): void {
     this.iframeElement.setAttribute("style", "display: none");
-    this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.HIDDEN });
   }
   public async send(message: any): Promise<any> {
-    this.showChild();
-    if (!this.iframe) {
-      this.logger("not ready to send");
-      return Promise.reject("not ready to send - iframe not available yet");
-    }
     const requestID = this.generateRequestID();
-    this.logger(`SEND ${message.type}`, this.iframe);
-    this.iframe!.postMessage({ requestID, request: message }, this.config.targetOrigin);
+    if (!this.iframe) {
+      this.startQueue.push({ requestID, request: message });
+    } else {
+      this.logger(`sending message to child iframe`, { requestID, request: message });
+      this.iframe!.postMessage({ requestID, request: message }, this.config.targetOrigin);
+    }
+
     return this.waitForResponse(requestID, response => {
-      this.logger(`RESPONSE`, requestID, response);
-      this.hideChild();
+      this.logger(`received response from child iframe`, requestID, response);
       return response;
     });
   }
@@ -141,11 +158,9 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   public async waitForChildInteraction(message: any): Promise<any> {
     try {
       const response = await this.send(message);
-      this.hideChild();
       return response;
     } catch (err) {
-      console.log("error waiting for iframe interaction");
-      this.hideChild();
+      console.log("error waiting for iframe interaction", err);
     }
   }
 
@@ -170,7 +185,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   private handleMessage(message: any): void {
     if (message.origin === this.config.targetOrigin) {
       this.dispatch({
-        type: RECEIVED_CHILD_MESSAGE,
+        type: MESSAGE_FROM_CHILD,
         payload: message.data,
       });
     }
