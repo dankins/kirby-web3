@@ -23,10 +23,14 @@ export interface CompleteViewAction {
 
 export type ViewPluginActions = RequestViewAction;
 
-export class ViewPlugin extends ChildPlugin {
+export interface ViewState {
+  queue: any[];
+}
+
+export class ViewPlugin extends ChildPlugin<any, ViewPluginActions> {
   public name = "view";
 
-  public reducer(state: any = { queue: [] }, action: any): any {
+  public reducer(state: any = { queue: [] }, action: any): ViewState {
     switch (action.type) {
       case REQUEST_VIEW_ACTION:
         return { ...state, queue: state.queue.concat(action.payload) };

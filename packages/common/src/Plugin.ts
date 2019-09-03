@@ -3,6 +3,7 @@ import debug = require("debug");
 import { Dispatch, AnyAction } from "redux";
 
 export abstract class Plugin<C = undefined, D = any, A extends AnyAction = any> {
+  public abstract type: string;
   public abstract name: string;
   public dependsOn: string[] = [];
   public dependencies: { [name: string]: any } = {};
@@ -26,7 +27,7 @@ export abstract class Plugin<C = undefined, D = any, A extends AnyAction = any> 
     getState: () => any,
     config: C,
   ): Promise<void> {
-    this.logger = debug("kirby:plugins:" + this.name);
+    this.logger = debug("kirby:" + this.type + ":" + this.name);
     this.dispatch = dispatch;
     this.getState = getState;
     if (config) {

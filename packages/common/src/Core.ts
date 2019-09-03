@@ -5,7 +5,6 @@ import {} from "redux-dynamic-middlewares";
 
 import debug from "debug";
 const logger = debug("kirby:core");
-debug.enable("kirby:*");
 
 export abstract class Core<P extends Plugin<any>> {
   private pluginList!: P[];

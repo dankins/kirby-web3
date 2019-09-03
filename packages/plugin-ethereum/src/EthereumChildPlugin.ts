@@ -1,9 +1,12 @@
-import { ChildIFrameProvider } from "./ChildIFrameProvider";
 import * as Portis from "@portis/web3";
+import Web3 = require("web3");
 import { MiddlewareAPI, Action, Dispatch } from "redux";
 import { ChildPlugin } from "@kirby-web3/child-core";
 import * as BurnerProvider from "burner-provider";
 import { REQUEST_VIEW_ACTION } from "@kirby-web3/child-core/build/ViewPlugin";
+
+import { ChildIFrameProvider } from "./ChildIFrameProvider";
+import { SEND_TO_PARENT } from "@kirby-web3/common";
 
 export interface EthereumChildPluginConfig {
   network: "mainnet" | "rinkeby" | "ropsten";
@@ -15,13 +18,20 @@ export interface EthereumChildPluginConfig {
 
 export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> {
   public name = "ethereum";
-  private provider!: ChildIFrameProvider;
+  public provider!: ChildIFrameProvider;
+  public web3: typeof Web3;
 
   public async startup(): Promise<void> {
-    this.provider = new ChildIFrameProvider((type, data) => {
-      // parent.postMessage({ type, data }, "http://localhost:3001");
+    this.provider = new ChildIFrameProvider(event => {
+      this.dispatch({ type: SEND_TO_PARENT, payload: event });
     });
     await this.provider.initialize();
+    this.web3 = new Web3(this.provider);
+
+    const win = window as any;
+    if (win.ethereum) {
+      win.ethereum.autoRefreshOnNetworkChange = false;
+    }
   }
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
@@ -54,23 +64,35 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     return state;
   }
 
-  public async enableWeb3(provider: string, requestID: string): Promise<void> {
-    if (provider === "MetaMask") {
+  public async enableWeb3(providerType: string, requestID: string): Promise<void> {
+    let concreteProvider;
+    if (providerType === "MetaMask") {
       const win = window as any;
       if (win.ethereum) {
+        await win.ethereum.enable();
+
         await this.provider.setConcreteProvider(win.ethereum);
+        concreteProvider = win.ethereum;
       } else {
         throw new Error("no injected web3 provided");
       }
-    } else if (provider === "Portis") {
+    } else if (providerType === "Portis") {
       const portis = new Portis(this.config.portis!.appID, this.config.network);
-      await this.provider.setConcreteProvider(portis.provider);
-    } else if (provider === "Burner Wallet") {
+      concreteProvider = portis.provider;
+    } else if (providerType === "Burner Wallet") {
       const burnerProvider = new BurnerProvider(this.config.rpcURL);
-      await this.provider.setConcreteProvider(burnerProvider);
+      concreteProvider = burnerProvider;
     } else {
       throw new Error("unrecognized provider");
     }
-    this.dispatch({ type: "PARENT_RESPONSE", requestID, payload: { requestID, provider, requestType: "WEB3_ENABLE" } });
+
+    await this.provider.setConcreteProvider(concreteProvider);
+    this.dispatch({
+      type: "PARENT_RESPONSE",
+      requestID,
+      payload: { requestID, provider: providerType, requestType: "WEB3_ENABLE" },
+    });
+    const accounts = await this.web3.eth.getAccounts();
+    this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts } });
   }
 }

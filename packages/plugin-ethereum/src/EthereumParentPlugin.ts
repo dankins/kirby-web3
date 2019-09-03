@@ -1,6 +1,6 @@
 import { ParentIFrameProvider } from "./ParentIFrameProvider";
 import { Action, MiddlewareAPI, Dispatch } from "redux";
-import { ParentPlugin, DMZ, RECEIVED_CHILD_MESSAGE } from "@kirby-web3/parent-core";
+import { ParentPlugin, DMZ, MESSAGE_FROM_CHILD } from "@kirby-web3/parent-core";
 
 // web3.js hates typescript *eyeroll*
 import WebWsProvider = require("web3-providers-ws");
@@ -44,10 +44,17 @@ export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, Eth
   public name = "ethereum";
   public dependsOn = ["dmz"];
   public web3: any;
+  public provider: any;
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
-    if (action.type === RECEIVED_CHILD_MESSAGE && action.payload.data.requestType === "WEB3_ENABLE") {
-      this.dispatch({ type: ETHEREUM_NEW_WEB3_INSTANCE, payload: { providerType: action.payload.providerType } });
+    if (action.type === MESSAGE_FROM_CHILD) {
+      const message = action.payload;
+      if (message.payload.requestType === "WEB3_ENABLE") {
+        this.dispatch({ type: ETHEREUM_NEW_WEB3_INSTANCE, payload: { providerType: action.payload.providerType } });
+      } else if (message.type === "WEB3_ON_ACCOUNTSCHANGED") {
+        this.logger("setting web3 default account", message.payload[0]);
+        this.web3.defaultAccount = message.payload[0];
+      }
     }
     next(action);
   };
@@ -63,23 +70,15 @@ export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, Eth
   }
 
   public async startup(): Promise<void> {
-    let readOnlyProvider;
-    if (this.config.readOnlyNodeURI.startsWith("ws")) {
-      readOnlyProvider = new WebWsProvider(this.config.readOnlyNodeURI);
-      // this.readonly = true;
-    } else if (this.config.readOnlyNodeURI.startsWith("http")) {
-      readOnlyProvider = new Web3HttpProvider(this.config.readOnlyNodeURI);
-      // this.readonly = true;
-    } else {
-      throw new Error("could not initialize provider");
+    if ((window as any).ethereum) {
+      (window as any).ethereum.autoRefreshOnNetworkChange = false;
     }
-    this.web3 = new Web3(readOnlyProvider);
+    this.provider = new ParentIFrameProvider(this.dependencies.dmz);
+    this.web3 = new Web3(this.provider);
   }
 
   public async requestSignerWeb3(): Promise<void> {
-    const provider = new ParentIFrameProvider(this.dependencies.dmz);
-    await provider.enable();
-    this.web3 = new Web3(provider);
+    await this.provider.enable();
     await this.getAccounts();
   }
 
