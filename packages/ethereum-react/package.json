@@ -10,9 +10,9 @@
         "clean": "rimraf ./build"
     },
     "dependencies": {
-        "@kirby-web3/parent-core": "1.0.0",
-        "@kirby-web3/parent-react": "1.0.0",
-        "@kirby-web3/plugin-ethereum": "1.0.0"
+        "@kirby-web3/parent-core": "^1.0.0",
+        "@kirby-web3/parent-react": "^1.0.0",
+        "@kirby-web3/plugin-ethereum": "^1.0.0"
     },
     "devDependencies": {
         "@types/react": "^16.8.23",
