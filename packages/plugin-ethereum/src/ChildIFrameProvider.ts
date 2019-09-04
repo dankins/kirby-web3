@@ -51,9 +51,9 @@ export class ChildIFrameProvider {
   }
 
   public async send(data: any, cb: any): Promise<any> {
-    return this.provider.send(data, cb);
+    return this.provider.sendAsync(data, cb);
   }
-
+  
   public async sendBatch(methods: any[], moduleInstance: any): Promise<any[]> {
     return this.provider.sendBatch(methods, moduleInstance);
   }

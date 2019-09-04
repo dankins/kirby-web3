@@ -40,7 +40,7 @@ const MyComponent = () => {
     const accts = await ethereumPlugin.getAccounts();
     console.log("checking balance ", accts)
     let balance = 0
-    if (accts && accts.length>0) {
+    if (accts && accts.length> 0) {
       console.log("getting balance...")
       balance = await web3.eth.getBalance(accts[0])
       console.log("balance", balance)
@@ -49,6 +49,9 @@ const MyComponent = () => {
   }
 
   React.useEffect(() => {
+
+    ethereumPlugin.web3.currentProvider.enable()
+
     setTimeout(getWeb3Info, 0);
     const interval = setInterval(getWeb3Info, 1000);
     return () => clearInterval(interval);
@@ -92,7 +95,7 @@ const MyComponent = () => {
         <div className="mainText">
           Your balance is
           <span style={{color: "#00C851", padding: 10}}>
-            {chainState.balance}
+            {chainState.balance/10**18}ETH
           </span>
         </div>
         <div className="mainText">
@@ -104,7 +107,7 @@ const MyComponent = () => {
       <Button onClick={async () => ethereumPlugin.requestSignerWeb3()} variant="success" size="lg">Connected</Button>
     )
   }
-  
+
   return (
     <div>
       <div style={{position: "absolute", right: "5%", top: "3%"}}>
