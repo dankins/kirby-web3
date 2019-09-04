@@ -11,15 +11,18 @@
     },
     "dependencies": {
         "@kirby-web3/parent-core": "1.0.0",
-        "@kirby-web3/plugin-ethereum": "1.0.0",
+        "@kirby-web3/plugin-ethereum": "1.0.0"
+    },
+    "devDependencies": {
         "@types/react": "^16.8.23",
         "@types/react-redux": "^7.1.2",
         "react": "^16.8.6",
         "react-redux": "^7.1.1",
-        "redux": "^4.0.4"
-    },
-    "devDependencies": {
+        "redux": "^4.0.4",
         "typescript": "^3.5.3"
+    },
+    "peerDependencies": {
+        "react": "^16.8.6"
     },
     "publishConfig": {
         "access": "public"
