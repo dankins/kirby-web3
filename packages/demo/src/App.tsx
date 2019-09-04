@@ -1,34 +1,51 @@
 import * as React from "react";
-import { KirbyProvider, KirbyContext, IKirbyContext, useSelector } from "@kirby-web3/parent-react";
-import { EthereumParentPlugin } from "@kirby-web3/plugin-ethereum";
+import {
+  KirbyEthereum,
+  KirbyEthereumProvider,
+  KirbyEthereumContext,
+  useKirbySelector,
+} from "@kirby-web3/ethereum-react";
 
 const MyComponent = () => {
-  const ctx = React.useContext<IKirbyContext>(KirbyContext);
-  const ethereumPlugin = ctx.kirby.plugins.ethereum as EthereumParentPlugin;
+  const [accounts, setAccounts] = React.useState<string[]>([]);
+  const [signature, setSignature] = React.useState<string | null>(null);
+  const kirby = React.useContext<KirbyEthereum>(KirbyEthereumContext);
 
-  const kirbyData = useSelector((state: any) => {
+  const kirbyData = useKirbySelector((state: any) => {
     return {
       readonly: state.ethereum.readonly,
       account: state.ethereum.account,
     };
   });
 
+  React.useEffect(() => {
+    async function getAccounts(): Promise<void> {
+      const newAccounts = await kirby.web3.eth.getAccounts();
+      setAccounts(newAccounts);
+    }
+
+    getAccounts().catch(err => {
+      console.log("error getting accounts", err);
+    });
+  }, [kirby, kirbyData.readonly]);
+
   async function requestSign(): Promise<any> {
-    const accts = await ethereumPlugin.getAccounts();
-    const web3 = ethereumPlugin.web3;
-    const result = await web3.eth.personal.sign("hello", accts[0]);
+    const web3 = kirby!.web3;
+    const result = await web3.eth.personal.sign("hello", (await accounts)[0]);
     console.log("signature:", result);
+    setSignature(result);
     return result;
   }
 
   return (
     <div>
       <div>web3: {kirbyData.readonly ? "read only" : "signer available"}</div>
-      <div>account: {kirbyData.account}</div>
+      <div>account: {accounts.join(",")}</div>
       <div>
-        <button onClick={async () => ethereumPlugin.requestSignerWeb3()}>request signer web3 </button>
+        <button onClick={async () => kirby.web3.currentProvider.enable()}>request signer web3 </button>
       </div>
       <div>{!kirbyData.readonly ? <button onClick={async () => requestSign()}>web3 sign</button> : null}</div>
+      {signature ? <div>signature: {signature}</div> : null}
     </div>
   );
 };
@@ -43,14 +60,12 @@ const config = {
   },
 };
 
-const plugins = [new EthereumParentPlugin()];
-
 const App: React.FC = () => {
   return (
     <div className="App">
-      <KirbyProvider plugins={plugins} config={config}>
+      <KirbyEthereumProvider config={config}>
         <MyComponent />
-      </KirbyProvider>
+      </KirbyEthereumProvider>
     </div>
   );
 };
