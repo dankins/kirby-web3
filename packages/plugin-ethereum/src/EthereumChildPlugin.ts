@@ -21,6 +21,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   public name = "ethereum";
   public provider!: ChildIFrameProvider;
   public web3: typeof Web3;
+  public dependsOn = ["iframe"];
 
   public async startup(): Promise<void> {
     this.provider = new ChildIFrameProvider(event => {
@@ -50,9 +51,9 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       if (this.config.burnerPreference === "always") {
         const burnerProvider = new BurnerProvider({
           rpcUrl: this.config.rpcURL, // oof I don't like the difference in caps here rpcUrl is the standard
-          namespace: "someparentsite.com"
+          namespace: this.dependencies.iframe.parentDomain
         });
-        return this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID)
+        this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID);
       } else {
         console.log("ENABLE!!!!",this.config)
         this.dispatch({
