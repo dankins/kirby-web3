@@ -59,12 +59,14 @@ export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, Eth
     next(action);
   };
 
-  public reducer(state: EthereumPluginState = { readonly: true }, action: Action): any {
+  public reducer(state: EthereumPluginState = { readonly: true }, action: any): any {
     if (action.type === ETHEREUM_NEW_WEB3_INSTANCE) {
       return { ...state, readonly: false };
-    } else if (action.type === ETHEREUM_ACCOUNT_CHANGE) {
-      const tAction = action as AccountChange;
-      return { ...state, account: tAction.payload.accounts[0] };
+    } else if (action.type === MESSAGE_FROM_CHILD) {
+      const message = action.payload;
+      if (message.type === "WEB3_ON_ACCOUNTSCHANGED") {
+        return { ...state, account: message.payload[0] };
+      }
     }
     return state;
   }

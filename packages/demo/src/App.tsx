@@ -7,31 +7,40 @@ import {
 } from "@kirby-web3/ethereum-react";
 
 const MyComponent = () => {
-  const [accounts, setAccounts] = React.useState<string[]>([]);
+  const [blockNumber, setBlockNumber] = React.useState<string[]>([]);
   const [signature, setSignature] = React.useState<string | null>(null);
   const kirby = React.useContext<KirbyEthereum>(KirbyEthereumContext);
 
-  const kirbyData = useKirbySelector((state: any) => {
-    return {
-      readonly: state.ethereum.readonly,
-      account: state.ethereum.account,
-    };
-  });
+  console.log("render MyComponent");
+
+  const readonly = useKirbySelector((state: any) => state.ethereum.readonly);
+  const account = useKirbySelector((state: any) => state.ethereum.account);
 
   React.useEffect(() => {
-    async function getAccounts(): Promise<void> {
-      const newAccounts = await kirby.web3.eth.getAccounts();
-      setAccounts(newAccounts);
+    if (readonly === true) {
+      kirby.enable().catch(err => {
+        console.log("error enabling web3", err);
+      });
     }
+  }, [kirby, readonly]);
 
-    getAccounts().catch(err => {
-      console.log("error getting accounts", err);
+  React.useEffect(() => {
+    async function updateBlockNumber(): Promise<void> {
+      setBlockNumber(await kirby.web3.eth.getBlockNumber());
+    }
+    const ticker = setInterval(updateBlockNumber, 10000);
+    updateBlockNumber().catch(err => {
+      console.log("error updating block number", err);
     });
-  }, [kirby, kirbyData.readonly]);
+
+    return function cleanup(): void {
+      clearInterval(ticker);
+    };
+  }, [kirby.web3.eth]);
 
   async function requestSign(): Promise<any> {
     const web3 = kirby!.web3;
-    const result = await web3.eth.personal.sign("hello", (await accounts)[0]);
+    const result = await web3.eth.personal.sign("hello", account);
     console.log("signature:", result);
     setSignature(result);
     return result;
@@ -39,13 +48,14 @@ const MyComponent = () => {
 
   return (
     <div>
-      <div>web3: {kirbyData.readonly ? "read only" : "signer available"}</div>
-      <div>account: {accounts.join(",")}</div>
+      <div>web3: {readonly ? "read only" : "signer available"}</div>
+      <div>kirby account: {account}</div>
       <div>
         <button onClick={async () => kirby.web3.currentProvider.enable()}>request signer web3 </button>
       </div>
-      <div>{!kirbyData.readonly ? <button onClick={async () => requestSign()}>web3 sign</button> : null}</div>
+      <div>{!readonly ? <button onClick={async () => requestSign()}>web3 sign</button> : null}</div>
       {signature ? <div>signature: {signature}</div> : null}
+      {blockNumber ? <div>blockNumber: {blockNumber}</div> : null}
     </div>
   );
 };
