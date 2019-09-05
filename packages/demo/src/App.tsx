@@ -1,25 +1,42 @@
 import * as React from "react";
+import {
+  KirbyEthereum,
+  KirbyEthereumProvider,
+  KirbyEthereumContext,
+  useKirbySelector,
+} from "@kirby-web3/ethereum-react";
+
 import Button from "react-bootstrap/Button";
 import { getChain } from "evm-chains";
-import { KirbyProvider, KirbyContext, IKirbyContext, useSelector } from "@kirby-web3/parent-react";
-import { EthereumParentPlugin } from "@kirby-web3/plugin-ethereum";
 
 const MyComponent = () => {
-  const ctx = React.useContext<IKirbyContext>(KirbyContext);
-  const ethereumPlugin = ctx.kirby.plugins.ethereum as EthereumParentPlugin;
+  const [accounts, setAccounts] = React.useState<string[]>([]);
+  const [signature, setSignature] = React.useState<string | null>(null);
+  const kirby = React.useContext<KirbyEthereum>(KirbyEthereumContext);
 
-  const kirbyData = useSelector((state: any) => {
+  const kirbyData = useKirbySelector((state: any) => {
     return {
       readonly: state.ethereum.readonly,
       account: state.ethereum.account
     };
   });
 
+  React.useEffect(() => {
+    async function getAccounts(): Promise<void> {
+      const newAccounts = await kirby.web3.eth.getAccounts();
+      setAccounts(newAccounts);
+    }
+
+    getAccounts().catch(err => {
+      console.log("error getting accounts", err);
+    });
+  }, [kirby, kirbyData.readonly]);
+
   async function requestSign(): Promise<any> {
-    const accts = await ethereumPlugin.getAccounts();
-    const web3 = ethereumPlugin.web3;
-    const result = await web3.eth.personal.sign("hello", accts[0]);
+    const web3 = kirby!.web3;
+    const result = await web3.eth.personal.sign("hello", (await accounts)[0]);
     console.log("signature:", result);
+    setSignature(result);
     return result;
   }
 
@@ -30,14 +47,14 @@ const MyComponent = () => {
   });
 
   async function getWeb3Info(): Promise<any> {
-    const web3 = ethereumPlugin.web3;
+    const web3 = kirby.web3;
     const networkId = await web3.eth.net.getId()
     const networkObject = await getChain(networkId)
     const network = networkObject.name
     console.log("network", network);
     const block = await web3.eth.getBlockNumber()
     console.log("block", block);
-    const accts = await ethereumPlugin.getAccounts();
+    const accts = await web3.eth.getAccounts();
     console.log("checking balance ", accts)
     let balance = 0
     if (accts && accts.length> 0) {
@@ -50,14 +67,12 @@ const MyComponent = () => {
 
   React.useEffect(() => {
 
-    ethereumPlugin.web3.currentProvider.enable()
+    //kirby.web3.currentProvider.enable()
 
     setTimeout(getWeb3Info, 0);
     const interval = setInterval(getWeb3Info, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  console.log("state.ethereum", ctx.kirby.plugins.ethereum)
 
   let statusDisplay
   let connectButton
@@ -81,7 +96,7 @@ const MyComponent = () => {
       </div>
     )
     connectButton = (
-      <Button onClick={async () => ethereumPlugin.requestSignerWeb3()} variant="primary" size="lg">Connect</Button>
+      <Button onClick={async () => kirby.web3.currentProvider.enable()} variant="primary" size="lg">Connect</Button>
     )
   } else {
     statusDisplay = (
@@ -104,7 +119,7 @@ const MyComponent = () => {
       </div>
     )
     connectButton = (
-      <Button onClick={async () => ethereumPlugin.requestSignerWeb3()} variant="success" size="lg">Connected</Button>
+      <Button onClick={async () => {alert("do some reconnect thing here")}} variant="success" size="lg">Connected</Button>
     )
   }
 
@@ -113,7 +128,6 @@ const MyComponent = () => {
       <div style={{position: "absolute", right: "5%", top: "3%"}}>
         {connectButton}
       </div>
-
       <div style={{marginTop: "20%"}}>
         <div className="mainText">
           Demo
@@ -135,7 +149,6 @@ const MyComponent = () => {
         </div>
 
         {statusDisplay}
-
       </div>
     </div>
   );
@@ -151,14 +164,12 @@ const config = {
   },
 };
 
-const plugins = [new EthereumParentPlugin()];
-
 const App: React.FC = () => {
   return (
     <div className="App">
-      <KirbyProvider plugins={plugins} config={config}>
+      <KirbyEthereumProvider config={config}>
         <MyComponent />
-      </KirbyProvider>
+      </KirbyEthereumProvider>
     </div>
   );
 };

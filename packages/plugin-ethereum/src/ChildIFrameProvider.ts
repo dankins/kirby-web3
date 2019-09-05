@@ -11,8 +11,14 @@ export class ChildIFrameProvider {
     this.eventHandler = eventHandler;
   }
 
-  public async initialize(): Promise<void> {
-    const readOnlyProvider = new WebWsProvider("wss://rinkeby.infura.io/ws/v3/06b8a36891d649ffa92950aeac5a7874");
+  public async initialize(readOnlyRPCUrl: string): Promise<void> {
+    let readOnlyProvider;
+    if (readOnlyRPCUrl.startsWith("ws")) {
+      readOnlyProvider = new WebWsProvider(readOnlyRPCUrl);
+    } else {
+      readOnlyProvider = new Web3HttpProvider(readOnlyRPCUrl);
+    }
+
     await this.setConcreteProvider(readOnlyProvider);
   }
 
@@ -32,15 +38,19 @@ export class ChildIFrameProvider {
 
   public async setConcreteProvider(provider: any): Promise<void> {
     this.provider = provider;
-    provider.on("data", (data: any) => {
-      this.eventHandler({ type: "WEB3_ON_DATA", payload: data });
-    });
-    provider.on("accountsChanged", (accounts: string[]) => {
-      this.eventHandler({ type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts });
-    });
-    provider.on("networkChanged", (network: any) => {
-      this.eventHandler({ type: "WEB3_ON_NETWORKCHANGED", payload: network });
-    });
+    // set up listeners for providers that support subscriptions
+    if (provider.on) {
+      provider.on("data", (data: any) => {
+        this.eventHandler({ type: "WEB3_ON_DATA", payload: data });
+      });
+      provider.on("accountsChanged", (accounts: string[]) => {
+        this.eventHandler({ type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts });
+      });
+      provider.on("networkChanged", (network: any) => {
+        this.eventHandler({ type: "WEB3_ON_NETWORKCHANGED", payload: network });
+      });
+    }
+
     if (provider.enable) {
       await provider.enable();
     }
@@ -71,7 +81,11 @@ export class ChildIFrameProvider {
   }
 
   public on(type: string, callback: () => void): void {
-    this.provider.on(type, callback);
+    if (this.provider.on) {
+      this.provider.on(type, callback);
+    } else {
+      console.warn("setting up a subscription on a provider that does not support them");
+    }
   }
 
   public removeListener(type: string, callback: () => void): void {

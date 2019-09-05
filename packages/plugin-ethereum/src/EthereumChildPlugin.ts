@@ -27,12 +27,13 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     this.provider = new ChildIFrameProvider(event => {
       this.dispatch({ type: SEND_TO_PARENT, payload: event });
     });
-    await this.provider.initialize();
+    await this.provider.initialize(this.config.rpcURL);
     this.web3 = new Web3(this.provider);
-
-    const win = window as any;
-    if (win.ethereum) {
-      win.ethereum.autoRefreshOnNetworkChange = false;
+    if (window) {
+      const win = window as any;
+      if (win.ethereum) {
+        win.ethereum.autoRefreshOnNetworkChange = false;
+      }
     }
   }
 
