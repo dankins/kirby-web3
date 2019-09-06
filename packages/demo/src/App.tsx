@@ -51,23 +51,23 @@ const MyComponent = () => {
     const networkId = await web3.eth.net.getId()
     const networkObject = await getChain(networkId)
     const network = networkObject.name
-    console.log("network", network);
+    console.log("-----network", network);
     const block = await web3.eth.getBlockNumber()
-    console.log("block", block);
+    console.log("----block", block);
     const accts = await web3.eth.getAccounts();
-    console.log("checking balance ", accts)
+    console.log("------checking balance ", accts)
     let balance = 0
     if (accts && accts.length> 0) {
-      console.log("getting balance...")
+      console.log("----getting balance...")
       balance = await web3.eth.getBalance(accts[0])
-      console.log("balance", balance)
+      console.log("----balance", balance)
     }
     setChainState({network, block, balance})
   }
 
   React.useEffect(() => {
 
-    //kirby.web3.currentProvider.enable()
+    //kirby.web3.eth.currentProvider.enable()
 
     setTimeout(getWeb3Info, 0);
     const interval = setInterval(getWeb3Info, 1000);
@@ -96,7 +96,15 @@ const MyComponent = () => {
       </div>
     )
     connectButton = (
-      <Button onClick={async () => kirby.web3.currentProvider.enable()} variant="primary" size="lg">Connect</Button>
+      <Button onClick={async () => {
+        alert("HELLO")
+        console.log("KIRBY:")
+        //console.log(kirby)
+        //console.log(kirby.web3);
+        //console.log(kirby.web3.eth);
+        //console.log(kirby.web3.eth.currentProvider);
+        ///kirby.web3.eth.currentProvider.enable()
+      }} variant="primary" size="lg">Connect</Button>
     )
   } else {
     statusDisplay = (
@@ -145,7 +153,7 @@ const MyComponent = () => {
           <span style={{color: "#ffbb33", paddingRight: 10}}>
             {chainState.block}
           </span>
-          is the most recent block mined
+          is the most recent block
         </div>
 
         {statusDisplay}
