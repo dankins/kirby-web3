@@ -41,4 +41,8 @@ export class KirbyEthereum {
   public async getAccounts(): Promise<string[]> {
     return (this.kirby.plugins.ethereum as EthereumParentPlugin).getAccounts();
   }
+
+  public async enable(): Promise<void> {
+    return (this.kirby.plugins.ethereum as EthereumParentPlugin).web3.eth.currentProvider.enable();
+  }
 }

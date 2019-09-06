@@ -10,31 +10,38 @@ import Button from "react-bootstrap/Button";
 import { getChain } from "evm-chains";
 
 const MyComponent = () => {
-  const [accounts, setAccounts] = React.useState<string[]>([]);
+  const [blockNumber, setBlockNumber] = React.useState<string[]>([]);
   const [signature, setSignature] = React.useState<string | null>(null);
   const kirby = React.useContext<KirbyEthereum>(KirbyEthereumContext);
 
-  const kirbyData = useKirbySelector((state: any) => {
-    return {
-      readonly: state.ethereum.readonly,
-      account: state.ethereum.account
-    };
-  });
+  const readonly = useKirbySelector((state: any) => state.ethereum.readonly);
+  const account = useKirbySelector((state: any) => state.ethereum.account);
 
   React.useEffect(() => {
-    async function getAccounts(): Promise<void> {
-      const newAccounts = await kirby.web3.eth.getAccounts();
-      setAccounts(newAccounts);
+    if (readonly === true) {
+      kirby.enable().catch(err => {
+        console.log("error enabling web3", err);
+      });
     }
+  }, [kirby, readonly]);
 
-    getAccounts().catch(err => {
-      console.log("error getting accounts", err);
+  React.useEffect(() => {
+    async function updateBlockNumber(): Promise<void> {
+      setBlockNumber(await kirby.web3.eth.getBlockNumber());
+    }
+    const ticker = setInterval(updateBlockNumber, 10000);
+    updateBlockNumber().catch(err => {
+      console.log("error updating block number", err);
     });
-  }, [kirby, kirbyData.readonly]);
+
+    return function cleanup(): void {
+      clearInterval(ticker);
+    };
+  }, [kirby.web3.eth]);
 
   async function requestSign(): Promise<any> {
     const web3 = kirby!.web3;
-    const result = await web3.eth.personal.sign("hello", (await accounts)[0]);
+    const result = await web3.eth.personal.sign("hello", account);
     console.log("signature:", result);
     setSignature(result);
     return result;
@@ -71,7 +78,7 @@ const MyComponent = () => {
 
   let statusDisplay
   let connectButton
-  if (kirbyData.readonly) {
+  if (readonly) {
     statusDisplay = (
       <div>
         <div className="mainText">
@@ -96,13 +103,12 @@ const MyComponent = () => {
       }} variant="primary" size="lg">Connect</Button>
     )
   } else {
-    console.log("==========>>>>>", kirbyData)
     statusDisplay = (
       <div>
         <div className="mainText">
           Connected as
           <span style={{color: "#0d47a1", paddingLeft: 10}}>
-            {kirbyData.account}
+            {account}
           </span>
         </div>
         <div className="mainText">
@@ -148,6 +154,7 @@ const MyComponent = () => {
 
         {statusDisplay}
       </div>
+
     </div>
   );
 };
