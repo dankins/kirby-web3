@@ -51,23 +51,18 @@ const MyComponent = () => {
     const networkId = await web3.eth.net.getId()
     const networkObject = await getChain(networkId)
     const network = networkObject.name
-    console.log("-----network", network);
     const block = await web3.eth.getBlockNumber()
-    console.log("----block", block);
     const accts = await web3.eth.getAccounts();
-    console.log("------checking balance ", accts)
     let balance = 0
-    if (accts && accts.length> 0) {
-      console.log("----getting balance...")
+    if (accts && accts.length > 0) {
       balance = await web3.eth.getBalance(accts[0])
-      console.log("----balance", balance)
     }
     setChainState({network, block, balance})
   }
 
   React.useEffect(() => {
 
-    //kirby.web3.eth.currentProvider.enable()
+    kirby.web3.currentProvider.enable()
 
     setTimeout(getWeb3Info, 0);
     const interval = setInterval(getWeb3Info, 1000);
@@ -97,16 +92,11 @@ const MyComponent = () => {
     )
     connectButton = (
       <Button onClick={async () => {
-        alert("HELLO")
-        console.log("KIRBY:")
-        //console.log(kirby)
-        //console.log(kirby.web3);
-        //console.log(kirby.web3.eth);
-        //console.log(kirby.web3.eth.currentProvider);
-        ///kirby.web3.eth.currentProvider.enable()
+        kirby.web3.currentProvider.enable()
       }} variant="primary" size="lg">Connect</Button>
     )
   } else {
+    console.log("==========>>>>>", kirbyData)
     statusDisplay = (
       <div>
         <div className="mainText">
@@ -118,7 +108,7 @@ const MyComponent = () => {
         <div className="mainText">
           Your balance is
           <span style={{color: "#00C851", padding: 10}}>
-            {chainState.balance/10**18}ETH
+            { chainState.balance / (10 ** 18) }ETH
           </span>
         </div>
         <div className="mainText">
