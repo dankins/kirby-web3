@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@kirby-web3/parent-react": "1.0.0",
+    "@kirby-web3/plugin-ethereum": "1.0.0",
+    "bootstrap": "^4.3.1",
+    "evm-chains": "^0.1.1",
     "@kirby-web3/ethereum-react": "1.0.0",
     "react": "^16.8.6",
+    "react-bootstrap": "^1.0.0-beta.12",
     "react-dom": "^16.8.6",
     "react-scripts": "3.1.1",
     "styled-components": "^4.3.2"

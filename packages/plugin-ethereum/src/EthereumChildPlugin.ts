@@ -11,6 +11,7 @@ import { SEND_TO_PARENT } from "@kirby-web3/common";
 export interface EthereumChildPluginConfig {
   network: "mainnet" | "rinkeby" | "ropsten";
   rpcURL: string;
+  burnerPreference: string;
   portis?: {
     appID: string;
   };
@@ -20,6 +21,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   public name = "ethereum";
   public provider!: ChildIFrameProvider;
   public web3: typeof Web3;
+  public dependsOn = ["iframe"];
 
   public async startup(): Promise<void> {
     this.provider = new ChildIFrameProvider(event => {
@@ -47,10 +49,18 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
           this.logger("middleware error: ", err);
         });
     } else if (action.type === "PARENT_REQUEST" && action.data.type === "WEB3_ENABLE") {
-      this.dispatch({
-        type: REQUEST_VIEW_ACTION,
-        payload: { route: "/ethereum/web3enable", requestID: action.requestID },
-      });
+      if (this.config.burnerPreference === "always") {
+        const burnerProvider = new BurnerProvider({
+          rpcUrl: this.config.rpcURL, // oof I don't like the difference in caps here rpcUrl is the standard
+          namespace: this.dependencies.iframe.parentDomain
+        });
+        (this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID)).catch(err => console.log);
+      } else {
+        this.dispatch({
+          type: REQUEST_VIEW_ACTION,
+          payload: { route: "/ethereum/web3enable", requestID: action.requestID },
+        });
+      }
       return;
     }
     next(action);
@@ -87,6 +97,10 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       throw new Error("unrecognized provider");
     }
 
+    await this.activateWeb3(concreteProvider, providerType, requestID);
+  }
+
+  public async activateWeb3(concreteProvider: any, providerType: string, requestID: string): Promise<void> {
     await this.provider.setConcreteProvider(concreteProvider);
     this.dispatch({
       type: "PARENT_RESPONSE",
