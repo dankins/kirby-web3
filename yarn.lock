@@ -1355,64 +1355,6 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@kirby-web3/child-core@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@kirby-web3/child-core/-/child-core-1.2.0.tgz#2b0297bcfbee6bd9085d61d440db47d9d887481d"
-  integrity sha512-m5AwZJ8kpZmVcipDGrghfB+Rcz5bQZSQJMzT6kIIQ9sjf/sIW8PmTq5jgilwsFBBF+DiRTYePF6RrrJO1J+eeQ==
-  dependencies:
-    "@kirby-web3/common" "1.1.0"
-    "@types/debug" "^4.1.5"
-    debug "^4.1.1"
-    redux "^4.0.4"
-
-"@kirby-web3/common@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@kirby-web3/common/-/common-1.1.0.tgz#e499a370814e3260e99951b67e6e1994e4e22457"
-  integrity sha512-p/TDLJU+AY5XGo8mt3v+Vi40nfzg7lu3CH5x/G5Bc6jaZwfnUHO28CitNzpqY51LmFb2oR7YPVuvhZmXyO/3+g==
-  dependencies:
-    "@types/debug" "^4.1.5"
-    debug "^4.1.1"
-    redux "^4.0.4"
-    redux-dynamic-middlewares "^1.0.0"
-
-"@kirby-web3/parent-core@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@kirby-web3/parent-core/-/parent-core-1.1.0.tgz#e8affdd4c47da94bc006baac9c7ba60482e51c95"
-  integrity sha512-XViFmDkir1dQyjsrEzJqJ4AEV71GrZhQk/WSa3274gF/XrA4vfZ92gvhJdFbY12rqBaJwZMST2Miz59fa306rQ==
-  dependencies:
-    "@kirby-web3/common" "1.1.0"
-    debug "^4.1.1"
-    events "^3.0.0"
-    redux "^4.0.4"
-    web3 "^1.2.0"
-    web3-providers-http "^1.2.0"
-    web3-providers-ws "^1.2.0"
-
-"@kirby-web3/parent-react@^1.0.1":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@kirby-web3/parent-react/-/parent-react-1.1.0.tgz#6901dc3d93128d712a9a9b6ad36256c6aed6f7a8"
-  integrity sha512-SJwuHBD3qZljSiBql0iBtspeBQPyFbAeWHuIdFgojwa2DngkMxfDwnRiaV31WS3DyQX5kb2gMUvUc56rlbKPTw==
-  dependencies:
-    "@kirby-web3/parent-core" "1.1.0"
-    "@kirby-web3/plugin-ethereum" "1.2.0"
-
-"@kirby-web3/plugin-ethereum@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@kirby-web3/plugin-ethereum/-/plugin-ethereum-1.2.0.tgz#903e34c0d324b87f3cfa85226595e2d3faae530b"
-  integrity sha512-IY+SG6T45yikQlFzxKVDj75eV1h6aXDCCsEI6rrK0Ac3FhtfENTCTUKj4zZfXsisDggXMqlxjA+v6SYnJMTayw==
-  dependencies:
-    "@kirby-web3/child-core" "1.2.0"
-    "@kirby-web3/common" "1.1.0"
-    "@kirby-web3/parent-core" "1.1.0"
-    "@portis/web3" "^2.0.0-beta.36"
-    burner-provider "^1.0.5"
-    debug "^4.1.1"
-    redux "^4.0.4"
-    web3 "^1.2.1"
-    web3-providers-http "^1.2.0"
-    web3-providers-ws "^1.2.0"
-    web3-utils "^1.2.1"
-
 "@lerna/add@3.16.2":
   version "3.16.2"
   resolved "https://registry.yarnpkg.com/@lerna/add/-/add-3.16.2.tgz#90ecc1be7051cfcec75496ce122f656295bd6e94"
@@ -6442,7 +6384,7 @@ debug@^4.0.0, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1:
   dependencies:
     ms "^2.1.1"
 
-debuglog@*, debuglog@^1.0.1:
+debuglog@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/debuglog/-/debuglog-1.0.1.tgz#aa24ffb9ac3df9a2351837cfb2d279360cd78492"
   integrity sha1-qiT/uaw9+aI1GDfPstJ5NgzXhJI=
@@ -9730,7 +9672,7 @@ import-local@^2.0.0:
     pkg-dir "^3.0.0"
     resolve-cwd "^2.0.0"
 
-imurmurhash@*, imurmurhash@^0.1.4:
+imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
   integrity sha1-khi5srkoojixPcT7a21XbyMUU+o=
@@ -12018,11 +11960,6 @@ lockfile@^1.0.4:
   dependencies:
     signal-exit "^3.0.2"
 
-lodash._baseindexof@*:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/lodash._baseindexof/-/lodash._baseindexof-3.1.0.tgz#fe52b53a1c6761e42618d654e4a25789ed61822c"
-  integrity sha1-/lK1OhxnYeQmGNZU5KJXie1hgiw=
-
 lodash._baseuniq@~4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash._baseuniq/-/lodash._baseuniq-4.6.0.tgz#0ebb44e456814af7905c6212fa2c9b2d51b841e8"
@@ -12031,32 +11968,10 @@ lodash._baseuniq@~4.6.0:
     lodash._createset "~4.0.0"
     lodash._root "~3.0.0"
 
-lodash._bindcallback@*:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/lodash._bindcallback/-/lodash._bindcallback-3.0.1.tgz#e531c27644cf8b57a99e17ed95b35c748789392e"
-  integrity sha1-5THCdkTPi1epnhftlbNcdIeJOS4=
-
-lodash._cacheindexof@*:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/lodash._cacheindexof/-/lodash._cacheindexof-3.0.2.tgz#3dc69ac82498d2ee5e3ce56091bafd2adc7bde92"
-  integrity sha1-PcaayCSY0u5ePOVgkbr9Ktx73pI=
-
-lodash._createcache@*:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/lodash._createcache/-/lodash._createcache-3.1.2.tgz#56d6a064017625e79ebca6b8018e17440bdcf093"
-  integrity sha1-VtagZAF2JeeevKa4AY4XRAvc8JM=
-  dependencies:
-    lodash._getnative "^3.0.0"
-
 lodash._createset@~4.0.0:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/lodash._createset/-/lodash._createset-4.0.3.tgz#0f4659fbb09d75194fa9e2b88a6644d363c9fe26"
   integrity sha1-D0ZZ+7CddRlPqeK4imZE02PJ/iY=
-
-lodash._getnative@*, lodash._getnative@^3.0.0:
-  version "3.9.1"
-  resolved "https://registry.yarnpkg.com/lodash._getnative/-/lodash._getnative-3.9.1.tgz#570bc7dede46d61cdcde687d65d3eecbaa3aaff5"
-  integrity sha1-VwvH3t5G1hzc3mh9ZdPuy6o6r/U=
 
 lodash._reinterpolate@^3.0.0:
   version "3.0.0"
@@ -12162,11 +12077,6 @@ lodash.pick@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.pick/-/lodash.pick-4.4.0.tgz#52f05610fff9ded422611441ed1fc123a03001b3"
   integrity sha1-UvBWEP/53tQiYRRB7R/BI6AwAbM=
-
-lodash.restparam@*:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/lodash.restparam/-/lodash.restparam-3.6.1.tgz#936a4e309ef330a7645ed4145986c85ae5b20805"
-  integrity sha1-k2pOMJ7zMKdkXtQUWYbIWuWyCAU=
 
 lodash.sample@^4.2.1:
   version "4.2.1"
@@ -15737,7 +15647,7 @@ react-dev-utils@^9.0.3:
     strip-ansi "5.2.0"
     text-table "0.2.0"
 
-react-dom@^16.8.6, react-dom@^16.9.0:
+react-dom@^16.8.6:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.9.0.tgz#5e65527a5e26f22ae3701131bcccaee9fb0d3962"
   integrity sha512-YFT2rxO9hM70ewk9jq0y6sQk8cL02xm4+IzYBz75CQGlClQQ1Bxq0nhHF6OtSbit+AIahujJgb/CPRibFkMNJQ==
@@ -15880,7 +15790,7 @@ react-transition-group@^4.0.0:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react@^16.8.6, react@^16.9.0:
+react@^16.8.6:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.9.0.tgz#40ba2f9af13bc1a38d75dbf2f4359a5185c4f7aa"
   integrity sha512-+7LQnFBwkiw+BobzOF6N//BdoNw0ouwmSJTEm9cglOOmsg/TMiFHZLe2sEoN5M7LgJTj9oHH0gxklfnQe66S1w==
@@ -19227,6 +19137,7 @@ websocket-extensions@>=0.1.1:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
+    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"

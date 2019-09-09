@@ -54,7 +54,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
           rpcUrl: this.config.rpcURL, // oof I don't like the difference in caps here rpcUrl is the standard
           namespace: this.dependencies.iframe.parentDomain
         });
-        this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID);
+        (this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID)).catch(err => console.log);
       } else {
         this.dispatch({
           type: REQUEST_VIEW_ACTION,
