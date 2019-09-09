@@ -56,7 +56,6 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
         });
         this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID);
       } else {
-        console.log("ENABLE!!!!",this.config)
         this.dispatch({
           type: REQUEST_VIEW_ACTION,
           payload: { route: "/ethereum/web3enable", requestID: action.requestID },
