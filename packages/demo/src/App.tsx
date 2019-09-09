@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Router, RouteComponentProps } from "@reach/router";
+
 import {
   KirbyEthereum,
   KirbyEthereumProvider,
@@ -6,10 +8,14 @@ import {
   useKirbySelector,
 } from "@kirby-web3/ethereum-react";
 
+import { ConnextParentPlugin } from "@kirby-web3/plugin-connext";
+
+import { Connext } from "./connext/Connext";
+
 import Button from "react-bootstrap/Button";
 import { getChain } from "evm-chains";
 
-const MyComponent = () => {
+const MyComponent: React.FC<RouteComponentProps> = () => {
   const [, setBlockNumber] = React.useState<string[]>([]);
   const [, setSignature] = React.useState<string | null>(null);
   const kirby = React.useContext<KirbyEthereum>(KirbyEthereumContext);
@@ -167,11 +173,16 @@ const config = {
   },
 };
 
+const plugins = [new ConnextParentPlugin()];
+
 const App: React.FC = () => {
   return (
     <div className="App">
-      <KirbyEthereumProvider config={config}>
-        <MyComponent />
+      <KirbyEthereumProvider plugins={plugins} config={config}>
+        <Router>
+          <MyComponent path="/" />
+          <Connext path="/connext/*" />
+        </Router>
       </KirbyEthereumProvider>
     </div>
   );

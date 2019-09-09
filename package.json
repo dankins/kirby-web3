@@ -16,6 +16,10 @@
     "test": "CI=true lerna run test --stream --sort",
     "prettier": "prettier --config .prettierrc.yaml --write --list-different './**/*.{ts,tsx,json,md}'"
   },
+  "resolutions": {
+    "ethers": "^4.0.33",
+    "web3-eth-abi/ethers": "^4.0.33"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/joincivil/kirby-web3.git"

@@ -54,7 +54,7 @@ export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, Eth
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.type === MESSAGE_FROM_CHILD) {
       const message = action.payload;
-      if (message.payload.requestType === "WEB3_ENABLE") {
+      if (message.payload && message.payload.requestType === "WEB3_ENABLE") {
         this.dispatch({ type: ETHEREUM_NEW_WEB3_INSTANCE, payload: { providerType: action.payload.providerType } });
       } else if (message.type === "WEB3_ON_ACCOUNTSCHANGED") {
         this.logger("setting web3 default account", message.payload[0]);

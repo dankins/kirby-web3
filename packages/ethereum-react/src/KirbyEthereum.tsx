@@ -4,7 +4,7 @@ import { EthereumParentPlugin } from "@kirby-web3/plugin-ethereum";
 
 export { useSelector as useKirbySelector } from "@kirby-web3/parent-react";
 
-const plugins = [new EthereumParentPlugin()];
+const defaultPlugins = [new EthereumParentPlugin()];
 
 // @ts-ignore let the default value be null
 export const KirbyEthereumContext = React.createContext<KirbyEthereum>(null);
@@ -19,10 +19,18 @@ const KirbyEthereumInner: React.FunctionComponent = ({ children }) => {
 
 export interface KirbyEthereumProviderProps {
   config: any;
+  plugins?: any[];
 }
-export const KirbyEthereumProvider: React.FunctionComponent<KirbyEthereumProviderProps> = ({ config, children }) => {
+export const KirbyEthereumProvider: React.FunctionComponent<KirbyEthereumProviderProps> = ({
+  config,
+  plugins,
+  children,
+}) => {
+  const allPlugins = React.useMemo(() => {
+    return plugins ? [...defaultPlugins, ...plugins] : defaultPlugins;
+  }, [plugins]);
   return (
-    <KirbyProvider plugins={plugins} config={config}>
+    <KirbyProvider plugins={allPlugins} config={config}>
       <KirbyEthereumInner>{children}</KirbyEthereumInner>
     </KirbyProvider>
   );
