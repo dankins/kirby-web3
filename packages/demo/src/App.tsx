@@ -123,7 +123,9 @@ const MyComponent = () => {
       </div>
     )
     connectButton = (
-      <Button onClick={async () => {alert("do some reconnect thing here")}} variant="success" size="lg">Connected</Button>
+      <Button onClick={async () => {
+        kirby.ethereum.changeAccount()
+      }} variant="success" size="lg">Connected</Button>
     )
   }
 

@@ -10,6 +10,7 @@ import Web3 = require("web3");
 // EthereumPlugin action types
 export const ETHEREUM_NEW_WEB3_INSTANCE = "ETHEREUM_NEW_WEB3_INSTANCE";
 export const ETHEREUM_ACCOUNT_CHANGE = "ETHEREUM_ACCOUNT_CHANGE";
+export const ETHEREUM_WEB3_CHANGE_ACCOUNT = "ETHEREUM_WEB3_CHANGE_ACCOUNT";
 
 export interface EthereumPluginState {
   readonly: boolean;
@@ -30,7 +31,11 @@ export interface AccountChange {
   };
 }
 
-export type EthereumPluginActions = NewWeb3Instance | AccountChange;
+export interface ChangeAccount {
+  type: typeof ETHEREUM_WEB3_CHANGE_ACCOUNT;
+}
+
+export type EthereumPluginActions = NewWeb3Instance | AccountChange | ChangeAccount;
 
 export interface Config {
   readOnlyNodeURI: string;
@@ -69,6 +74,15 @@ export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, Eth
       }
     }
     return state;
+  }
+
+  public async changeAccount(): Promise<void> {
+    const action: EthereumPluginActions = {
+      type: ETHEREUM_WEB3_CHANGE_ACCOUNT,
+    };
+    this.logger("sending request to change account", action);
+    const response = await this.dependencies.dmz.send(action);
+    this.logger("send change account response:", response);
   }
 
   public async startup(): Promise<void> {
