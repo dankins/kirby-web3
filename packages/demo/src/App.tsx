@@ -10,8 +10,8 @@ import Button from "react-bootstrap/Button";
 import { getChain } from "evm-chains";
 
 const MyComponent = () => {
-  const [blockNumber, setBlockNumber] = React.useState<string[]>([]);
-  const [signature, setSignature] = React.useState<string | null>(null);
+  const [, setBlockNumber] = React.useState<string[]>([]);
+  const [, setSignature] = React.useState<string | null>(null);
   const kirby = React.useContext<KirbyEthereum>(KirbyEthereumContext);
 
   const readonly = useKirbySelector((state: any) => state.ethereum.readonly);
@@ -50,111 +50,109 @@ const MyComponent = () => {
   const [chainState, setChainState] = React.useState({
     network: "Unknown",
     block: "loading...",
-    balance: 0
+    balance: 0,
   });
 
   async function getWeb3Info(): Promise<any> {
     const web3 = kirby.web3;
-    const networkId = await web3.eth.net.getId()
-    const networkObject = await getChain(networkId)
-    const network = networkObject.name
-    const block = await web3.eth.getBlockNumber()
+    const networkId = await web3.eth.net.getId();
+    const networkObject = await getChain(networkId);
+    const network = networkObject.name;
+    const block = await web3.eth.getBlockNumber();
     const accts = await web3.eth.getAccounts();
-    let balance = 0
+    let balance = 0;
     if (accts && accts.length > 0) {
-      balance = await web3.eth.getBalance(accts[0])
+      balance = await web3.eth.getBalance(accts[0]);
     }
-    setChainState({network, block, balance})
+    setChainState({ network, block, balance });
   }
 
   React.useEffect(() => {
-
-    kirby.web3.currentProvider.enable()
+    kirby.web3.currentProvider.enable();
 
     setTimeout(getWeb3Info, 0);
     const interval = setInterval(getWeb3Info, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  let statusDisplay
-  let connectButton
+  let statusDisplay;
+  let connectButton;
   if (readonly) {
     statusDisplay = (
       <div>
         <div className="mainText">
           You are in
-          <span style={{color: "#ff4444", padding: 10}}>
-            read-only
-          </span>
+          <span style={{ color: "#ff4444", padding: 10 }}>read-only</span>
           mode
         </div>
         <div className="mainText">
           Click
-          <span style={{color: "#0099CC", padding: 10}}>
-            Connect
-          </span>
+          <span style={{ color: "#0099CC", padding: 10 }}>Connect</span>
           to select a web3 provider
         </div>
       </div>
-    )
+    );
     connectButton = (
-      <Button onClick={async () => {
-        kirby.web3.currentProvider.enable()
-      }} variant="primary" size="lg">Connect</Button>
-    )
+      <Button
+        onClick={async () => {
+          kirby.web3.currentProvider.enable();
+        }}
+        variant="primary"
+        size="lg"
+      >
+        Connect
+      </Button>
+    );
   } else {
     statusDisplay = (
       <div>
         <div className="mainText">
           Connected as
-          <span style={{color: "#0d47a1", paddingLeft: 10}}>
-            {account}
-          </span>
+          <span style={{ color: "#0d47a1", paddingLeft: 10 }}>{account}</span>
         </div>
         <div className="mainText">
           Your balance is
-          <span style={{color: "#00C851", padding: 10}}>
-            { chainState.balance / (10 ** 18) }ETH
-          </span>
+          <span style={{ color: "#00C851", padding: 10 }}>{chainState.balance / 10 ** 18}ETH</span>
         </div>
         <div className="mainText">
-          <Button onClick={async () => requestSign()} variant="secondary" size="lg">Sign Message</Button>
+          <Button onClick={async () => requestSign()} variant="secondary" size="lg">
+            Sign Message
+          </Button>
         </div>
       </div>
-    )
+    );
     connectButton = (
-      <Button onClick={async () => {alert("do some reconnect thing here")}} variant="success" size="lg">Connected</Button>
-    )
+      <Button
+        onClick={() => {
+          alert("do some reconnect thing here");
+        }}
+        variant="success"
+        size="lg"
+      >
+        Connected
+      </Button>
+    );
   }
 
   return (
     <div>
-      <div style={{position: "absolute", right: "5%", top: "3%"}}>
-        {connectButton}
-      </div>
-      <div style={{marginTop: "20%"}}>
+      <div style={{ position: "absolute", right: "5%", top: "3%" }}>{connectButton}</div>
+      <div style={{ marginTop: "20%" }}>
         <div className="mainText">
           Demo
-          <span style={{color: "#ff4081", padding: 10}}>
-            Kirby
-          </span>
+          <span style={{ color: "#ff4081", padding: 10 }}>Kirby</span>
           dApp on the
-          <span style={{color: "#aa66cc", padding: 10}}>
-            {chainState.network}
-          </span>
+          <span style={{ color: "#aa66cc", padding: 10 }}>{chainState.network}</span>
           network
         </div>
 
         <div className="mainText">
-          <span style={{color: "#ffbb33", paddingRight: 10}}>
-            {chainState.block}
-          </span>
+          <span style={{ color: "#ffbb33", paddingRight: 10 }}>{chainState.block}</span>
           is the most recent block
         </div>
 
         {statusDisplay}
       </div>
-
     </div>
   );
 };
