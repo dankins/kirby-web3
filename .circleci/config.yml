@@ -44,6 +44,10 @@ jobs:
                 name: Netlify - Child App
                 command: |
                     if [ "$CIRCLE_BRANCH" = "master" ];  then yarn netlify:child-app; fi
+            - run:
+                name: Netlify - Demo
+                command: |
+                    if [ "$CIRCLE_BRANCH" = "master" ];  then yarn netlify:demo; fi
 
 workflows:
     version: 2
