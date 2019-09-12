@@ -14,7 +14,7 @@ export const ReceivePayment: React.FunctionComponent<RouteComponentProps> = prop
   });
 
   // state
-  const [loading, setLoading] = React.useState(false);
+  const [, setLoading] = React.useState(false);
 
   // effects
   React.useMemo(() => {

@@ -22,6 +22,9 @@ jobs:
                     - node_modules
             - run:
                 name: Building
+                environment:
+                    REACT_APP_IFRAME_SRC: https://kirbyweb3.com
+                    REACT_APP_TARGET_ORIGIN: https://kirbyweb3.com
                 command:  yarn build
             - run:
                 name: Ensuring prettified

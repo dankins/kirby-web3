@@ -165,8 +165,8 @@ const MyComponent: React.FC<RouteComponentProps> = () => {
 
 const config = {
   dmz: {
-    targetOrigin: "http://localhost:3002",
-    iframeSrc: "http://localhost:3002",
+    targetOrigin: process.env.REACT_APP_TARGET_ORIGIN,
+    iframeSrc: process.env.REACT_APP_IFRAME_SRC,
   },
   ethereum: {
     readOnlyNodeURI: process.env.REACT_APP_ETHEREUM_NODE!,
