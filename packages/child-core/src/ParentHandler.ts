@@ -10,7 +10,26 @@ import {
 import { ChildPlugin } from "./ChildPlugin";
 import { REQUEST_VIEW_ACTION, COMPLETE_VIEW_ACTION } from "./ViewPlugin";
 
-export class ParentHandler extends ChildPlugin {
+export const PARENT_RESPONSE = "PARENT_RESPONSE";
+export const PARENT_REQUEST = "PARENT_REQUEST";
+export interface ParentResponseAction {
+  type: typeof PARENT_RESPONSE;
+  requestID: number;
+  payload: any;
+}
+
+export interface ParentRequestAction {
+  type: typeof PARENT_REQUEST;
+  requestID: number;
+  data: any;
+}
+
+export type ParentHandlerActions = ParentResponseAction | ParentRequestAction;
+
+export type Config = any;
+export type State = any;
+
+export class ParentHandler extends ChildPlugin<Config, State, ParentHandlerActions> {
   public name = "iframe";
   public parentDomain: string;
 
@@ -43,7 +62,7 @@ export class ParentHandler extends ChildPlugin {
     if (message.origin === this.parentDomain) {
       if (message.data.requestID) {
         this.dispatch({
-          type: "PARENT_REQUEST",
+          type: PARENT_REQUEST,
           requestID: message.data.requestID,
           data: message.data.request,
         });
@@ -52,7 +71,7 @@ export class ParentHandler extends ChildPlugin {
   }
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
-    if (action.type === "PARENT_RESPONSE") {
+    if (action.type === PARENT_RESPONSE) {
       this.sendToParent({ type: CHILD_RESPONSE, requestID: action.requestID, payload: action.payload });
     } else if (action.type === REQUEST_VIEW_ACTION) {
       this.sendToParent({ type: CHILD_SHOW_VIEW, payload: {} });
@@ -84,5 +103,9 @@ export class ParentHandler extends ChildPlugin {
 
   public sendToParent(message: ChildToParentMessage): void {
     parent.postMessage(message, this.parentDomain);
+  }
+
+  public respond(requestID: number, payload: any): void {
+    this.dispatch({ type: PARENT_RESPONSE, requestID, payload });
   }
 }

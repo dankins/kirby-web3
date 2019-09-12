@@ -1,0 +1,32 @@
+{
+  "name": "@kirby-web3/plugin-connext",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "lint": "tslint --project ./",
+    "build:watch": "tsc -w",
+    "build": "tsc",
+    "clean": "rimraf ./build"
+  },
+  "dependencies": {
+    "@connext/client": "^0.0.21",
+    "@connext/types": "^0.0.21",
+    "@kirby-web3/child-core": "^1.0.0",
+    "@kirby-web3/common": "^1.0.0",
+    "@kirby-web3/parent-core": "^1.0.0",
+    "@kirby-web3/plugin-ethereum": "^1.3.0",
+    "@portis/web3": "^2.0.0-beta.36",
+    "burner-provider": "^1.0.5",
+    "debug": "^4.1.1",
+    "ethers": "^4.0.36",
+    "redux": "^4.0.4",
+    "web3": "^1.2.1",
+    "web3-providers-http": "^1.2.0",
+    "web3-providers-ws": "^1.2.0",
+    "web3-utils": "^1.2.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

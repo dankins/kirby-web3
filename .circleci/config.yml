@@ -14,7 +14,7 @@ jobs:
                 key: node-modules-{{ checksum "yarn.lock" }}
             - run:
                 name: Install modules
-                command: yarn --frozen-lockfile install
+                command: yarn --frozen-lockfile install --ignore-engines
             - save_cache:
                 name: Save yarn cache
                 key: node-modules-{{ checksum "yarn.lock" }}

@@ -52,9 +52,11 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       if (this.config.burnerPreference === "always") {
         const burnerProvider = new BurnerProvider({
           rpcUrl: this.config.rpcURL, // oof I don't like the difference in caps here rpcUrl is the standard
-          namespace: this.dependencies.iframe.parentDomain
+          namespace: this.dependencies.iframe.parentDomain,
         });
-        (this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID)).catch(err => {console.log(err)});
+        this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID).catch(err => {
+          console.log(err);
+        });
       } else {
         this.dispatch({
           type: REQUEST_VIEW_ACTION,
