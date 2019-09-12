@@ -13,6 +13,7 @@
     "build": "lerna run build --sort",
     "release": "multi-semantic-release",
     "netlify:child-app": "netlify deploy --prod --dir packages/child-app/build  --site $NETLIFY_SITE_ID_CHILD_APP",
+    "netlify:demo": "netlify deploy --prod --dir packages/demo/build  --site $NETLIFY_SITE_ID_DEMO",
     "test": "CI=true lerna run test --stream --sort",
     "prettier": "prettier --config .prettierrc.yaml --write --list-different './**/*.{ts,tsx,json,md}'"
   },
