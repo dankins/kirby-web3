@@ -19,10 +19,10 @@ const plugins = [
   new SignatureInterceptorPlugin({ autoSign: false }),
   new EthereumChildPlugin({
     burnerPreference: "always",
-    rpcURL: "wss://rinkeby.infura.io/ws/v3/06b8a36891d649ffa92950aeac5a7874",
+    rpcURL: process.env.REACT_APP_ETHEREUM_NODE!,
     network: "rinkeby",
     portis: {
-      appID: "1a382335-7ba0-4834-a3cd-dd1eff365f98",
+      appID: process.env.REACT_APP_PORTIS_APP_ID!,
     },
   }),
 ];
