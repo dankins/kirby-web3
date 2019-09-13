@@ -82,15 +82,13 @@ export class ParentHandler extends ChildPlugin<Config, State, ParentHandlerActio
         this.sendToParent({ type: CHILD_HIDE_VIEW, payload: {} });
       }
     } else if (action.type === SEND_TO_PARENT) {
-      console.log("SEND_TO_PARENT send to parent", action.payload);
+      this.logger("SEND_TO_PARENT", action.payload);
       this.sendToParent(action.payload);
     }
     next(action);
   };
 
   public reducer(state: any = { pending: [] }, action: any): any {
-    // this.logger("reduce", state, message);
-    // return this.provider.handleIFrameMessage(message.request.data);
     this.logger("got an action", action);
 
     switch (action.type) {

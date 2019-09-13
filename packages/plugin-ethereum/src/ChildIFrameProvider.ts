@@ -4,7 +4,7 @@ import Web3HttpProvider = require("web3-providers-http");
 
 export class ChildIFrameProvider {
   public provider: any;
-  private logger = debug("kirby:plugins:ethereum:ChildIFrameProvider");
+  private logger = debug("kirby:child:ethereum:ChildIFrameProvider");
   private eventHandler: (e: { type: string; payload: any }) => void;
 
   public constructor(eventHandler: (e: { type: string; payload: any }) => void) {
