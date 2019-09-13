@@ -2,7 +2,7 @@ import * as React from "react";
 import { CoreContext, useSelector } from "@kirby-web3/child-react";
 import { SignatureInterceptorPlugin } from "@kirby-web3/plugin-ethereum";
 import { RouteComponentProps } from "@reach/router";
-import { ViewPlugin } from "@kirby-web3/child-core/build/ViewPlugin";
+import { ViewPlugin } from "@kirby-web3/child-core";
 
 export const SignatureConfirm: React.FunctionComponent<RouteComponentProps> = () => {
   const ctx = React.useContext(CoreContext);

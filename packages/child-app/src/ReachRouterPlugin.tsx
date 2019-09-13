@@ -1,9 +1,7 @@
 import { MiddlewareAPI, Action } from "redux";
 import { Dispatch } from "react";
-import { ChildPlugin } from "@kirby-web3/child-core";
+import { ChildPlugin, REQUEST_VIEW_ACTION, COMPLETE_VIEW_ACTION } from "@kirby-web3/child-core";
 import { navigate } from "@reach/router";
-
-import { REQUEST_VIEW_ACTION, COMPLETE_VIEW_ACTION } from "@kirby-web3/child-core/build/ViewPlugin";
 
 export class ReachRouterPlugin extends ChildPlugin {
   public name = "reachRouter";

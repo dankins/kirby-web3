@@ -1,6 +1,5 @@
-import { ChildPlugin } from "@kirby-web3/child-core";
+import { ChildPlugin, REQUEST_VIEW_ACTION } from "@kirby-web3/child-core";
 import { MiddlewareAPI, Action, Dispatch } from "redux";
-import { REQUEST_VIEW_ACTION } from "@kirby-web3/child-core/build/ViewPlugin";
 import * as webUtils from "web3-utils";
 
 export const SIGNATURE_INTERCEPTOR = "SIGNATURE_INTERCEPTOR";

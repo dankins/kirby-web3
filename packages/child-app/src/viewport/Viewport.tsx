@@ -25,7 +25,7 @@ export const Viewport: React.FC = ({ children }) => {
   return (
     <StyledDiv>
       <Router>
-        <Web3Enable path="/ethereum/web3enable" />
+        <Web3Enable path="/ethereum/web3enable/:network" />
         <SignatureConfirm path="/ethereum/confirm-signature" />
       </Router>
     </StyledDiv>

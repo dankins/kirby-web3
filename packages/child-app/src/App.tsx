@@ -1,6 +1,6 @@
 import React from "react";
 import { KirbyChildProvider, overrideTheme } from "@kirby-web3/child-react";
-import { EthereumChildPlugin, SignatureInterceptorPlugin } from "@kirby-web3/plugin-ethereum";
+import { EthereumChildPlugin, SignatureInterceptorPlugin, Network } from "@kirby-web3/plugin-ethereum";
 import { ConnextChildPlugin } from "@kirby-web3/plugin-connext";
 
 import { Viewport } from "./viewport/Viewport";
@@ -19,8 +19,11 @@ const plugins = [
   new SignatureInterceptorPlugin({ autoSign: false }),
   new EthereumChildPlugin({
     burnerPreference: "always",
-    rpcURL: process.env.REACT_APP_ETHEREUM_NODE!,
-    network: "rinkeby",
+    networks: {
+      mainnet: process.env.REACT_APP_ETHEREUM_NODE_MAINNET!,
+      rinkeby: process.env.REACT_APP_ETHEREUM_NODE_RINKEBY!,
+    },
+    defaultNetwork: "rinkeby",
     portis: {
       appID: process.env.REACT_APP_PORTIS_APP_ID!,
     },
