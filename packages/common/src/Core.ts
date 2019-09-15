@@ -2,6 +2,7 @@ import { Plugin } from "./Plugin";
 import { createStore, Store, combineReducers, applyMiddleware } from "redux";
 import { default as dynamicMiddlewares, resetMiddlewares, addMiddleware } from "redux-dynamic-middlewares";
 import {} from "redux-dynamic-middlewares";
+import thunk from "redux-thunk";
 
 import debug from "debug";
 const logger = debug("kirby:core");
@@ -22,7 +23,7 @@ export abstract class Core<P extends Plugin<any>> {
     const defaultPlugins = this.defaultPlugins();
     this.pluginList = defaultPlugins.concat(plugins);
     const reducers: { [key: string]: any } = {};
-    let middleware: any = [];
+    let middleware: any = [thunk];
     this.pluginList.map(plugin => {
       reducers[plugin.name] = plugin.reducer.bind(plugin);
       this.plugins[plugin.name] = plugin;

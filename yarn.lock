@@ -8309,7 +8309,39 @@ ethereumjs-vm@^2.1.0, ethereumjs-vm@^2.3.4, ethereumjs-vm@^2.6.0:
     rustbn.js "~0.2.0"
     safe-buffer "^5.1.1"
 
-ethers@4.0.0-beta.3, ethers@4.0.33, ethers@^4.0.33, ethers@^4.0.36, ethers@^4.0.37:
+ethers@4.0.0-beta.3:
+  version "4.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.0-beta.3.tgz#15bef14e57e94ecbeb7f9b39dd0a4bd435bc9066"
+  integrity sha512-YYPogooSknTwvHg3+Mv71gM/3Wcrx+ZpCzarBj3mqs9njjRkrOo2/eufzhHloOCo3JSoNI4TQJJ6yU5ABm3Uog==
+  dependencies:
+    "@types/node" "^10.3.2"
+    aes-js "3.0.0"
+    bn.js "^4.4.0"
+    elliptic "6.3.3"
+    hash.js "1.1.3"
+    js-sha3 "0.5.7"
+    scrypt-js "2.0.3"
+    setimmediate "1.0.4"
+    uuid "2.0.1"
+    xmlhttprequest "1.8.0"
+
+ethers@4.0.33:
+  version "4.0.33"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.33.tgz#f7b88d2419d731a39aefc37843a3f293e396f918"
+  integrity sha512-lAHkSPzBe0Vj+JrhmkEHLtUEKEheVktIjGDyE9gbzF4zf1vibjYgB57LraDHu4/ItqWVkztgsm8GWqcDMN+6vQ==
+  dependencies:
+    "@types/node" "^10.3.2"
+    aes-js "3.0.0"
+    bn.js "^4.4.0"
+    elliptic "6.3.3"
+    hash.js "1.1.3"
+    js-sha3 "0.5.7"
+    scrypt-js "2.0.4"
+    setimmediate "1.0.4"
+    uuid "2.0.1"
+    xmlhttprequest "1.8.0"
+
+ethers@^4.0.36, ethers@^4.0.37:
   version "4.0.37"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.37.tgz#dfa70d59498663878c5e4a977d14356660ca5b90"
   integrity sha512-B7bDdyQ45A5lPr6k2HOkEKMtYOuqlfy+nNf8glnRvWidkDQnToKw1bv7UyrwlbsIgY2mE03UxTVtouXcT6Vvcw==
@@ -16845,6 +16877,11 @@ redux-dynamic-middlewares@^1.0.0:
   resolved "https://registry.yarnpkg.com/redux-dynamic-middlewares/-/redux-dynamic-middlewares-1.0.0.tgz#a4c5859a6018a1d7fab3bdd4989f51095c806d15"
   integrity sha512-smX1eY17dH90FVtXL6JPW01on1ptP4SOlkDYON5Lka52RNcZfgWM6hvtoZKA3O+dZL2/ytbS+tHo2gdKln5iHw==
 
+redux-thunk@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.3.0.tgz#51c2c19a185ed5187aaa9a2d08b666d0d6467622"
+  integrity sha512-km6dclyFnmcvxhAcrQV2AkZmPQjzPDjgVlQtR0EQjxZPyJ0BnMf3in1ryuR8A2qU0HldVRfxYXbFSKlI3N7Slw==
+
 redux@^4.0.0, redux@^4.0.4:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/redux/-/redux-4.0.4.tgz#4ee1aeb164b63d6a1bcc57ae4aa0b6e6fa7a3796"
@@ -17473,6 +17510,11 @@ schema-utils@^2.0.0, schema-utils@^2.0.1:
   dependencies:
     ajv "^6.10.2"
     ajv-keywords "^3.4.1"
+
+scrypt-js@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-2.0.3.tgz#bb0040be03043da9a012a2cea9fc9f852cfc87d4"
+  integrity sha1-uwBAvgMEPamgEqLOqfyfhSz8h9Q=
 
 scrypt-js@2.0.4:
   version "2.0.4"
