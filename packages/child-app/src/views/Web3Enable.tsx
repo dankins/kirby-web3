@@ -24,7 +24,6 @@ export const Web3Enable: React.FC<Web3EnableProps> = ({ network }) => {
   }
   return (
     <div>
-      {network}
       <LogInWithMetaMask onSelection={selection} />
       <LogInWithPortis onSelection={selection} />
       <LogInWithBurner onSelection={selection} />

@@ -52,7 +52,7 @@ export const AccountAvatar: React.FunctionComponent<AccountAvatarProps> = ({ acc
 
   return (
     <KirbyAvatar onClick={onClick}>
-      <img src={blockie} height={40} width={40} />
+      <img src={blockie} height={40} width={40} alt={account} />
       {logo}
     </KirbyAvatar>
   );

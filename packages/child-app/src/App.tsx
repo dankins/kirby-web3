@@ -1,10 +1,24 @@
 import React from "react";
 import { KirbyChildProvider, overrideTheme } from "@kirby-web3/child-react";
-import { EthereumChildPlugin, SignatureInterceptorPlugin, Network } from "@kirby-web3/plugin-ethereum";
+import { EthereumChildPlugin, SignatureInterceptorPlugin } from "@kirby-web3/plugin-ethereum";
 import { ConnextChildPlugin } from "@kirby-web3/plugin-connext";
 
 import { Viewport } from "./viewport/Viewport";
 import { ReachRouterPlugin } from "./ReachRouterPlugin";
+import { createGlobalStyle } from "styled-components";
+
+const GlobalStyle = createGlobalStyle`
+.por_portis-widget-frame {
+  top: 0 !important;
+  bottom: auto !important;
+}
+ @media (max-width: 576px)  {
+   .por_portis-widget-frame {
+     top: 0 !important;
+     bottom: auto !important;
+   }
+ }
+`;
 
 const theme = overrideTheme({
   headingFont: "Libre Franklin",
@@ -33,6 +47,7 @@ const plugins = [
 const App: React.FC = () => {
   return (
     <KirbyChildProvider plugins={plugins} theme={theme}>
+      <GlobalStyle></GlobalStyle>
       <Viewport />
     </KirbyChildProvider>
   );

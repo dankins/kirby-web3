@@ -27,6 +27,7 @@ export class ChildIFrameProvider {
       this.logger("WEB3_REQUEST", req, this.provider);
       req.method = this.provider.sendAsync ? "sendAsync" : "send";
       this.provider[req.method](req.params, (err: any, data: any) => {
+        this.logger("WEB3_REQUEST response", err, data);
         if (err) {
           reject(err);
         } else {

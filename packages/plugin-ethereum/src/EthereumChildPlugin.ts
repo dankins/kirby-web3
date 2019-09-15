@@ -38,7 +38,6 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   public dependsOn = ["iframe"];
 
   public async startup(): Promise<void> {
-    console.log("start", this.config);
     this.provider = new ChildIFrameProvider(event => {
       this.dispatch({ type: SEND_TO_PARENT, payload: event });
     });
@@ -99,7 +98,6 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       }
       return;
     } else if (action.type === "PARENT_REQUEST" && action.data.type === ETHEREUM_WEB3_CHANGE_ACCOUNT) {
-      console.log("holla", api.getState());
       this.dispatch({
         type: REQUEST_VIEW_ACTION,
         payload: {
@@ -110,7 +108,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       return;
     } else if (action.type === "PARENT_REQUEST" && action.data.type === ETHEREUM_WEB3_CHANGE_NETWORK) {
       this.changeNetwork(action.requestID, action.data.payload, api.getState().ethereum).catch(err => {
-        console.log("unable to change network: ", err);
+        console.error("unable to change network: ", err);
       });
       return;
     }
@@ -142,7 +140,6 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     } else if (providerType === ProviderTypes.BURNER) {
       const rpcUrl = this.config.networks[network];
       if (!rpcUrl) {
-        console.log(this.config.networks);
         throw new Error("could not build Burner Provider since there is no RPC URL defined for the network " + network);
       }
 
@@ -156,7 +153,6 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   }
 
   public async changeNetwork(requestID: number, network: Network, state: any): Promise<void> {
-    console.log("changeNetwork", requestID, network, state);
     if (state.network !== network) {
       await this.enableWeb3(requestID, state.providerType, network);
     } else {

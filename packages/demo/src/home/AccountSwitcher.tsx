@@ -11,14 +11,13 @@ export const AccountSwitcher = () => {
     return null;
   }
 
-  async function doSomething(): Promise<void> {
-    console.log("something");
-    await kirby.ethereum.changeAccount();
+  async function changeAccount(): Promise<void> {
+    return kirby.ethereum.changeAccount();
   }
 
   return (
     <div>
-      <AccountAvatar account={account} providerType={providerType} onClick={doSomething} />
+      <AccountAvatar account={account} providerType={providerType} onClick={changeAccount} />
     </div>
   );
 };
