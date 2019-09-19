@@ -14,7 +14,9 @@ import {
   CONNEXT_FREE_BALANCE_RESPONSE,
   EtherAddress,
 } from "./common";
-import { NodeChannel, LinkedTransferResponse } from "@connext/types";
+// import { NodeChannel, LinkedTransferResponse } from "@connext/types";
+type NodeChannel = any;
+type LinkedTransferResponse = any;
 
 export interface ConnextPluginState {
   channel?: NodeChannel;
@@ -130,7 +132,8 @@ export class ConnextParentPlugin extends ParentPlugin<Config, ParentDependencies
     this.logger("send payment response:", response);
   }
 
-  public async addFunds(): Promise<LinkedTransferResponse> {
+  // public async addFunds(): Promise<LinkedTransferResponse> {
+  public async addFunds(): Promise<any> {
     const action: ConnextAddFundsRequestAction = {
       type: CONNEXT_ADD_FUNDS_REQUEST,
     };
