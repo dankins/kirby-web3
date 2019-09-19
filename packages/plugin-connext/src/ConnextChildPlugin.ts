@@ -1,7 +1,7 @@
 import { Action, MiddlewareAPI, Dispatch } from "redux";
 import { ChildPlugin, ParentHandlerActions, PARENT_REQUEST, ParentHandler } from "@kirby-web3/child-core";
 import { EthereumChildPlugin } from "@kirby-web3/plugin-ethereum";
-import * as connext from "@connext/client";
+// import * as connext from "@connext/client";
 import { Wallet, ethers } from "ethers";
 
 import { store } from "./store";
@@ -13,7 +13,26 @@ import {
   CONNEXT_FREE_BALANCE_REQUEST,
   CONNEXT_ADD_FUNDS_REQUEST,
 } from "./common";
-import { NodeChannel, ChannelState, LinkedTransferResponse } from "@connext/types";
+// import { NodeChannel, ChannelState, LinkedTransferResponse } from "@connext/types";
+
+type NodeChannel = any;
+type ChannelState = any;
+type LinkedTransferResponse = any;
+
+const connext = {
+  connect: () => {
+    console.log("stub connext, not actually doing anything");
+    return {};
+  },
+  utils: {
+    createPaymentId(): number {
+      return 1;
+    },
+    createPreImage(): number {
+      return 1;
+    },
+  },
+};
 
 // action types
 export const CHILD_CONNEXT_SEND_PAYMENT = "CONNEXT_SEND_PAYMENT";
@@ -54,7 +73,8 @@ export interface ChildDependencies {
 export class ConnextChildPlugin extends ChildPlugin<ChildConfig, ChildDependencies, ChildPluginActions> {
   public name = "connext";
   public dependsOn = ["ethereum", "iframe"];
-  public channel?: connext.ConnextInternal;
+  // public channel?: connext.ConnextInternal;
+  public channel?: any;
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.type === PARENT_REQUEST) {

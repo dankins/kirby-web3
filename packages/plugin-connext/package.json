@@ -10,8 +10,6 @@
     "clean": "rimraf ./build"
   },
   "dependencies": {
-    "@connext/client": "^0.0.21",
-    "@connext/types": "^0.0.21",
     "@kirby-web3/child-core": "^1.0.0",
     "@kirby-web3/common": "^1.0.0",
     "@kirby-web3/parent-core": "^1.0.0",
