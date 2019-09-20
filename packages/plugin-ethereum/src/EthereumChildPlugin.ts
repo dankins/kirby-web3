@@ -1,8 +1,9 @@
 import * as Portis from "@portis/web3";
 import { MiddlewareAPI, Action, Dispatch } from "redux";
 import * as BurnerProvider from "burner-provider";
+import { ethers } from "ethers";
 
-import { ChildPlugin, REQUEST_VIEW_ACTION } from "@kirby-web3/child-core";
+import { ChildPlugin, REQUEST_VIEW_ACTION, ParentHandler } from "@kirby-web3/child-core";
 import { SEND_TO_PARENT } from "@kirby-web3/common";
 
 import { ChildIFrameProvider } from "./ChildIFrameProvider";
@@ -72,18 +73,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
         });
     } else if (action.type === "PARENT_REQUEST" && action.data.type === "WEB3_ENABLE") {
       if (this.config.burnerPreference === "always") {
-        const rpcUrl = this.config.networks[this.config.defaultNetwork];
-        if (!rpcUrl) {
-          console.error(rpcUrl, this.config.networks, this.config.defaultNetwork);
-          throw new Error(
-            "could not start Burner Provider since there is no RPC URL defined for the default network (this.config.networks[this.config.defaultNetwork])",
-          );
-        }
-
-        const burnerProvider = new BurnerProvider({
-          rpcUrl,
-          namespace: this.dependencies.iframe.parentDomain,
-        });
+        const burnerProvider = this.getBurnerProvider(this.config.defaultNetwork);
         this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID).catch(err => {
           console.log("unable to activate web3:", err);
         });
@@ -138,12 +128,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       const portis = new Portis(this.config.portis!.appID, network);
       concreteProvider = portis.provider;
     } else if (providerType === ProviderTypes.BURNER) {
-      const rpcUrl = this.config.networks[network];
-      if (!rpcUrl) {
-        throw new Error("could not build Burner Provider since there is no RPC URL defined for the network " + network);
-      }
-
-      const burnerProvider = new BurnerProvider({ rpcUrl, namespace: this.dependencies.iframe.parentDomain });
+      const burnerProvider = this.getBurnerProvider(network);
       concreteProvider = burnerProvider;
     } else {
       throw new Error("unrecognized provider: " + providerType);
@@ -174,5 +159,27 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     });
     this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_NETWORKCHANGED", payload: networkID } });
     this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts } });
+  }
+
+  public getBurnerProvider(network: Network): any {
+    const parentHandler = this.dependencies.iframe as ParentHandler;
+    const burnerMnemonic = parentHandler.getSitePreference("burner_mnemonic");
+    let pk;
+    if (!burnerMnemonic) {
+      const wallet = ethers.Wallet.createRandom();
+      const mnemonic = wallet.mnemonic;
+      pk = wallet.privateKey;
+      parentHandler.setSitePreference("burner_mnemonic", mnemonic);
+    } else {
+      const wallet = ethers.Wallet.fromMnemonic(burnerMnemonic);
+      pk = wallet.privateKey;
+    }
+
+    const rpcUrl = this.config.networks[network];
+    if (!rpcUrl) {
+      throw new Error("could not build Burner Provider since there is no RPC URL defined for the network " + network);
+    }
+
+    return new BurnerProvider({ rpcUrl, privateKey: pk });
   }
 }
