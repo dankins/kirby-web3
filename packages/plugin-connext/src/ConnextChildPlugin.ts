@@ -2,7 +2,7 @@ import { Action, MiddlewareAPI, Dispatch } from "redux";
 import { ChildPlugin, ParentHandlerActions, PARENT_REQUEST, ParentHandler } from "@kirby-web3/child-core";
 import { EthereumChildPlugin } from "@kirby-web3/plugin-ethereum";
 // import * as connext from "@connext/client";
-import { Wallet, ethers } from "ethers";
+import { ethers } from "ethers";
 
 import { store } from "./store";
 import {
@@ -114,16 +114,12 @@ export class ConnextChildPlugin extends ChildPlugin<ChildConfig, ChildDependenci
   }
 
   public getMnemonic(): string {
-    const CONNEXT_MNEMONIC = "CONNEXT_MNEMONIC";
-    let mnemonic = localStorage.getItem(CONNEXT_MNEMONIC);
+    const ethereumPlugin = this.dependencies.ethereum as EthereumChildPlugin;
+    const parentHandlerPlugin = this.dependencies.ethereum as ParentHandler;
+    // use this just for the side effect of setting the cookie preference
+    ethereumPlugin.getBurnerProvider("rinkeby");
 
-    if (!mnemonic) {
-      const wallet = Wallet.createRandom();
-      mnemonic = wallet.mnemonic;
-      localStorage.setItem(CONNEXT_MNEMONIC, mnemonic);
-    }
-
-    return mnemonic;
+    return parentHandlerPlugin.getSitePreference("burner_mnemonic");
   }
 
   public async openChannel(): Promise<NodeChannel> {
