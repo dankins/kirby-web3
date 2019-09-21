@@ -3,7 +3,13 @@ import { MiddlewareAPI, Action, Dispatch } from "redux";
 import * as BurnerProvider from "burner-provider";
 import { ethers } from "ethers";
 
-import { ChildPlugin, REQUEST_VIEW_ACTION, ParentHandler } from "@kirby-web3/child-core";
+import {
+  ChildPlugin,
+  REQUEST_VIEW_ACTION,
+  ParentHandler,
+  PARENT_REQUEST,
+  PARENT_RESPONSE,
+} from "@kirby-web3/child-core";
 import { SEND_TO_PARENT } from "@kirby-web3/common";
 
 import { ChildIFrameProvider } from "./ChildIFrameProvider";
@@ -61,18 +67,25 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   }
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
-    if (action.type === "PARENT_REQUEST" && action.data.type === "WEB3_REQUEST") {
+    if (action.type === PARENT_REQUEST && action.data.type === "WEB3_REQUEST") {
       this.provider
         .handleIFrameMessage(action.data.data)
         .then(response => {
           this.logger("got a response", response);
-          this.dispatch({ type: "PARENT_RESPONSE", requestID: action.requestID, payload: response });
+          this.dispatch({ type: PARENT_RESPONSE, requestID: action.requestID, payload: response });
         })
         .catch(err => {
           this.logger("middleware error: ", err);
         });
-    } else if (action.type === "PARENT_REQUEST" && action.data.type === "WEB3_ENABLE") {
-      if (this.config.burnerPreference === "always") {
+    } else if (action.type === PARENT_REQUEST && action.data.type === "WEB3_ENABLE") {
+      const iframePlugin = this.dependencies.iframe as ParentHandler;
+      const providerType = iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE");
+      if (providerType) {
+        // site has previously enabled web3, so return the saved type
+        this.enableWeb3(action.requestID, providerType, this.config.defaultNetwork).catch(err => {
+          console.log("unable to activate web3:", err);
+        });
+      } else if (this.config.burnerPreference === "always") {
         const burnerProvider = this.getBurnerProvider(this.config.defaultNetwork);
         this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID).catch(err => {
           console.log("unable to activate web3:", err);
@@ -106,7 +119,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   };
 
   public reducer(state: EthereumChildPluginState = {}, action: any): any {
-    if (action.type === "PARENT_RESPONSE" && action.payload && action.payload.requestType === "WEB3_ENABLE") {
+    if (action.type === PARENT_RESPONSE && action.payload && action.payload.requestType === "WEB3_ENABLE") {
       return { ...state, ...action.payload };
     }
     return state;
@@ -142,7 +155,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       await this.enableWeb3(requestID, state.providerType, network);
     } else {
       this.logger("do not need to change network");
-      this.dispatch({ type: "PARENT_RESPONSE", requestID, payload: network });
+      this.dispatch({ type: PARENT_RESPONSE, requestID, payload: network });
     }
   }
 
@@ -153,12 +166,19 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     const networkID: number = await this.web3.eth.net.getId();
     const network = IDToNetwork[networkID];
     this.dispatch({
-      type: "PARENT_RESPONSE",
+      type: PARENT_RESPONSE,
       requestID,
       payload: { providerType, network, requestType: "WEB3_ENABLE" },
     });
     this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_NETWORKCHANGED", payload: networkID } });
     this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts } });
+
+    // set the providerType preference if necessary
+    const iframePlugin = this.dependencies.iframe;
+    const savedProviderType = iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE");
+    if (savedProviderType !== providerType) {
+      iframePlugin.setSitePreference("WEB3_PROVIDER_TYPE", providerType);
+    }
   }
 
   public getBurnerProvider(network: Network): any {
