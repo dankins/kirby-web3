@@ -41,6 +41,7 @@ export type ParentHandlerActions = ParentResponseAction | ParentRequestAction | 
 
 export type Config = any;
 export interface ParentHandlerState {
+  parentDomain: string;
   pending: {
     [requestID: number]: any;
   };
@@ -114,7 +115,7 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
   }
 
   public reducer(
-    state: ParentHandlerState = { pending: {}, sitePreferences: {} },
+    state: ParentHandlerState = { pending: {}, sitePreferences: {}, parentDomain: this.parentDomain },
     action: ParentHandlerActions,
   ): ParentHandlerState {
     this.logger("got an action", action);
