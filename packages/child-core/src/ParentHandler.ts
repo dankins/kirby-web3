@@ -123,6 +123,9 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
     switch (action.type) {
       case PARENT_REQUEST:
         return { ...state, pending: { ...state.pending, [action.requestID]: action } };
+      case PARENT_RESPONSE:
+        const { [action.requestID]: _, ...nextPending } = state.pending;
+        return { ...state, pending: nextPending };
       case SITE_PREFERENCE_CHANGE:
         return { ...state, sitePreferences: action.payload };
     }
