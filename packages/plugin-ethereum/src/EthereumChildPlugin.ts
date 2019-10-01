@@ -79,15 +79,12 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
         });
     } else if (action.type === PARENT_REQUEST && action.data.type === "WEB3_ENABLE") {
       const iframePlugin = this.dependencies.iframe as ParentHandler;
-      const providerType = iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE");
+      const providerType =
+        iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE") ||
+        (this.config.burnerPreference === "always" && ProviderTypes.BURNER);
       if (providerType) {
         // site has previously enabled web3, so return the saved type
         this.enableWeb3(action.requestID, providerType, this.config.defaultNetwork).catch(err => {
-          console.log("unable to activate web3:", err);
-        });
-      } else if (this.config.burnerPreference === "always") {
-        const burnerProvider = this.getBurnerProvider(this.config.defaultNetwork);
-        this.activateWeb3(burnerProvider, "Burner Wallet", action.requestID).catch(err => {
           console.log("unable to activate web3:", err);
         });
       } else {
@@ -126,13 +123,20 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   }
 
   public async enableWeb3(requestID: number, providerType: string, network: Network): Promise<void> {
+    await this.changeProvider(providerType, network);
+
+    this.dispatch({
+      type: PARENT_RESPONSE,
+      requestID,
+      payload: { providerType, network, requestType: "WEB3_ENABLE" },
+    });
+  }
+
+  public async changeProvider(providerType: string, network: Network): Promise<any> {
     let concreteProvider;
-    if (providerType === "MetaMask") {
+    if (providerType === ProviderTypes.METAMASK) {
       const win = window as any;
       if (win.ethereum) {
-        await win.ethereum.enable();
-
-        await this.provider.setConcreteProvider(win.ethereum);
         concreteProvider = win.ethereum;
       } else {
         throw new Error("no injected web3 provided");
@@ -147,29 +151,9 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       throw new Error("unrecognized provider: " + providerType);
     }
 
-    await this.activateWeb3(concreteProvider, providerType, requestID);
-  }
-
-  public async changeNetwork(requestID: number, network: Network, state: any): Promise<void> {
-    if (state.network !== network) {
-      await this.enableWeb3(requestID, state.providerType, network);
-    } else {
-      this.logger("do not need to change network");
-      this.dispatch({ type: PARENT_RESPONSE, requestID, payload: network });
-    }
-  }
-
-  public async activateWeb3(concreteProvider: any, providerType: string, requestID: number): Promise<void> {
     await this.provider.setConcreteProvider(concreteProvider);
-    //
     const accounts = await this.web3.eth.getAccounts();
     const networkID: number = await this.web3.eth.net.getId();
-    const network = IDToNetwork[networkID];
-    this.dispatch({
-      type: PARENT_RESPONSE,
-      requestID,
-      payload: { providerType, network, requestType: "WEB3_ENABLE" },
-    });
     this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_NETWORKCHANGED", payload: networkID } });
     this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts } });
 
@@ -178,6 +162,17 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     const savedProviderType = iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE");
     if (savedProviderType !== providerType) {
       iframePlugin.setSitePreference("WEB3_PROVIDER_TYPE", providerType);
+    }
+
+    return concreteProvider;
+  }
+
+  public async changeNetwork(requestID: number, network: Network, state: any): Promise<void> {
+    if (state.network !== network) {
+      await this.enableWeb3(requestID, state.providerType, network);
+    } else {
+      this.logger("do not need to change network");
+      this.dispatch({ type: PARENT_RESPONSE, requestID, payload: network });
     }
   }
 
