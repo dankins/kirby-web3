@@ -14,17 +14,13 @@ import { SEND_TO_PARENT } from "@kirby-web3/common";
 
 import { ChildIFrameProvider } from "./ChildIFrameProvider";
 import Web3 = require("web3");
-import {
-  ETHEREUM_WEB3_CHANGE_ACCOUNT,
-  ETHEREUM_WEB3_CHANGE_NETWORK,
-  ProviderTypes,
-  Network,
-  IDToNetwork,
-} from "./common";
+import { ETHEREUM_WEB3_CHANGE_ACCOUNT, ETHEREUM_WEB3_CHANGE_NETWORK, ProviderTypes, Network } from "./common";
 
 export interface EthereumChildPluginState {
   providerType?: string;
   network?: Network;
+  networkID?: number;
+  accounts?: string[];
 }
 
 export interface EthereumChildPluginConfig {
@@ -118,6 +114,10 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   public reducer(state: EthereumChildPluginState = {}, action: any): any {
     if (action.type === PARENT_RESPONSE && action.payload && action.payload.requestType === "WEB3_ENABLE") {
       return { ...state, ...action.payload };
+    } else if (action.type === SEND_TO_PARENT && action.payload.type === "WEB3_ON_NETWORKCHANGED") {
+      return { ...state, networkID: action.payload.payload };
+    } else if (action.type === SEND_TO_PARENT && action.payload.type === "WEB3_ON_ACCOUNTSCHANGED") {
+      return { ...state, accounts: action.payload.payload };
     }
     return state;
   }
@@ -154,8 +154,12 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     await this.provider.setConcreteProvider(concreteProvider);
     const accounts = await this.web3.eth.getAccounts();
     const networkID: number = await this.web3.eth.net.getId();
-    this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_NETWORKCHANGED", payload: networkID } });
-    this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts } });
+    if (this.getState().ethereum.networkID !== networkID) {
+      this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_NETWORKCHANGED", payload: networkID } });
+    }
+    if (!this.getState().ethereum.accounts || this.getState().ethereum.accounts.join() !== accounts.join()) {
+      this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts } });
+    }
 
     // set the providerType preference if necessary
     const iframePlugin = this.dependencies.iframe;
