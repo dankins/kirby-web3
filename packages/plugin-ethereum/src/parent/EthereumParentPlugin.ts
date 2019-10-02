@@ -11,7 +11,7 @@ import {
   ChangeAccount,
   Network,
   IDToNetwork,
-} from "./common";
+} from "../common";
 
 // EthereumPlugin action types
 export const ETHEREUM_NEW_WEB3_INSTANCE = "ETHEREUM_NEW_WEB3_INSTANCE";
@@ -41,6 +41,9 @@ export type EthereumPluginActions = NewWeb3Instance | AccountChange;
 
 export interface Config {
   defaultNetwork: Network;
+  networks: {
+    [key in Network]?: string;
+  };
 }
 
 export interface Dependencies {
@@ -53,6 +56,21 @@ export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, Eth
   public web3: any;
   public provider: any;
 
+  public async startup(): Promise<void> {
+    if ((window as any).ethereum) {
+      (window as any).ethereum.autoRefreshOnNetworkChange = false;
+    }
+
+    const defaultReadOnlyRPC = this.config.networks[this.config.defaultNetwork];
+    if (!defaultReadOnlyRPC) {
+      console.error("could not start read-only RPC provider", this.config.defaultNetwork, this.config.networks);
+      throw new Error("could not start read-only RPC provider");
+    }
+
+    this.provider = new ParentIFrameProvider(this.dependencies.dmz, defaultReadOnlyRPC);
+    this.web3 = new Web3(this.provider);
+  }
+
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     if (action.type === MESSAGE_FROM_CHILD) {
       const message = action.payload;
@@ -61,6 +79,13 @@ export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, Eth
       } else if (message.type === "WEB3_ON_ACCOUNTSCHANGED") {
         this.logger("setting web3 default account", message.payload[0]);
         this.web3.defaultAccount = message.payload[0];
+      } else if (message.type === "WEB3_ON_NETWORKCHANGED") {
+        const readOnlyRPC = this.config.networks[IDToNetwork[message.payload]];
+        if (!readOnlyRPC) {
+          console.error("could not start read-only RPC provider", this.config.defaultNetwork, this.config.networks);
+          throw new Error("could not start read-only RPC provider");
+        }
+        this.provider.updateReadOnlyProvider(readOnlyRPC);
       }
     }
     next(action);
@@ -97,14 +122,6 @@ export class EthereumParentPlugin extends ParentPlugin<Config, Dependencies, Eth
     this.logger("sending request to change network", action);
     const response = await this.dependencies.dmz.send(action);
     this.logger("send change network response:", response);
-  }
-
-  public async startup(): Promise<void> {
-    if ((window as any).ethereum) {
-      (window as any).ethereum.autoRefreshOnNetworkChange = false;
-    }
-    this.provider = new ParentIFrameProvider(this.dependencies.dmz);
-    this.web3 = new Web3(this.provider);
   }
 
   public async requestSignerWeb3(): Promise<void> {

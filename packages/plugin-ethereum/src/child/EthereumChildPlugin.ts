@@ -14,7 +14,7 @@ import { SEND_TO_PARENT } from "@kirby-web3/common";
 
 import { ChildIFrameProvider } from "./ChildIFrameProvider";
 import Web3 = require("web3");
-import { ETHEREUM_WEB3_CHANGE_ACCOUNT, ETHEREUM_WEB3_CHANGE_NETWORK, ProviderTypes, Network } from "./common";
+import { ETHEREUM_WEB3_CHANGE_ACCOUNT, ETHEREUM_WEB3_CHANGE_NETWORK, ProviderTypes, Network } from "../common";
 
 export interface EthereumChildPluginState {
   providerType?: string;

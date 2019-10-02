@@ -15,6 +15,10 @@ const config = {
   },
   ethereum: {
     defaultNetwork: "rinkeby",
+    networks: {
+      mainnet: process.env.REACT_APP_ETHEREUM_NODE_MAINNET!,
+      rinkeby: process.env.REACT_APP_ETHEREUM_NODE_RINKEBY!,
+    },
   },
 };
 

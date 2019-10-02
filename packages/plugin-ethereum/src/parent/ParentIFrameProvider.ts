@@ -1,20 +1,31 @@
 import debug from "debug";
 import { DMZ } from "@kirby-web3/parent-core";
+import WebWsProvider = require("web3-providers-ws");
+import Web3HttpProvider = require("web3-providers-http");
 
 export class ParentIFrameProvider {
   private dmz: DMZ;
   private logger = debug("kirby:parent:ParentIFrameProvider");
-  constructor(dmz: DMZ) {
+  private readOnlyProvider: any;
+  constructor(dmz: DMZ, readOnlyRPCUrl: string) {
     this.dmz = dmz;
+    this.updateReadOnlyProvider(readOnlyRPCUrl);
+  }
+
+  public updateReadOnlyProvider(readOnlyRPCUrl: string): void {
+    console.log("updateReadOnlyProvider", readOnlyRPCUrl);
+    if (readOnlyRPCUrl.startsWith("ws")) {
+      this.readOnlyProvider = new WebWsProvider(readOnlyRPCUrl);
+    } else {
+      throw new Error("RPC URL must begin with `ws`");
+    }
   }
 
   public supportsSubscriptions(): boolean {
-    // return this.base.supportsSubscriptions();
     return false;
   }
 
   public registerEventListeners(): void {
-    // return this.base.registerEventListeners();
     this.logger("calling registerEventListeners");
     return;
   }
@@ -25,6 +36,9 @@ export class ParentIFrameProvider {
   }
 
   public async send(data: any, cb: any): Promise<any> {
+    if (["eth_getBalance", "eth_blockNumber", "eth_call", "eth_subscribe", "eth_getLogs"].indexOf(data.method) > -1) {
+      return this.readOnlyProvider.send(data, cb);
+    }
     return this.iframeMessage("send", cb, data);
   }
 
@@ -45,6 +59,10 @@ export class ParentIFrameProvider {
   }
 
   public on(type: string, callback: () => void): void {
+    if (type === "data") {
+      this.readOnlyProvider.on(type, callback);
+    }
+
     this.dmz.listen("WEB3_ON_" + type.toUpperCase(), callback);
   }
 

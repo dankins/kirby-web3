@@ -1,4 +1,4 @@
-import { ChildPlugin, REQUEST_VIEW_ACTION, ViewPlugin } from "@kirby-web3/child-core";
+import { ChildPlugin, ViewPlugin, PARENT_REQUEST, PARENT_RESPONSE } from "@kirby-web3/child-core";
 import { MiddlewareAPI, Action, Dispatch } from "redux";
 import * as webUtils from "web3-utils";
 
@@ -6,10 +6,22 @@ export const SIGNATURE_INTERCEPTOR = "SIGNATURE_INTERCEPTOR";
 export const SIGNATURE_INTERCEPTOR_CONFIRM = "SIGNATURE_INTERCEPTOR_CONFIRM";
 export const SIGNATURE_INTERCEPTOR_REJECT = "SIGNATURE_INTERCEPTOR_REJECT";
 
+export const TRANSACTION_INTERCEPTOR = "TRANSACTION_INTERCEPTOR";
+export const TRANSACTION_INTERCEPTOR_CONFIRM = "TRANSACTION_INTERCEPTOR_CONFIRM";
+export const TRANSACTION_INTERCEPTOR_REJECT = "TRANSACTION_INTERCEPTOR_REJECT";
+
 export function isSignatureRequest(action: any): boolean {
-  if (action.type === "PARENT_REQUEST" && action.data.type === "WEB3_REQUEST") {
+  if (action.type === PARENT_REQUEST && action.data.type === "WEB3_REQUEST") {
     const request = action.data.data;
     return request.method === "send" && request.params[0].method === "personal_sign";
+  }
+  return false;
+}
+
+export function isTransactionRequest(action: any): boolean {
+  if (action.type === PARENT_REQUEST && action.data.type === "WEB3_REQUEST") {
+    const request = action.data.data;
+    return request.method === "send" && request.params[0].method === "eth_sendTransaction";
   }
   return false;
 }
@@ -53,18 +65,26 @@ export class SignatureInterceptorPlugin extends ChildPlugin<SignatureInterceptor
         payload: request,
       });
       (this.dependencies.view as ViewPlugin).requestView("/ethereum/confirm-signature");
+    } else if (isTransactionRequest(action)) {
+      const request = { tx: action.data.data.params[0], originalAction: action };
+      this.dispatch({
+        type: TRANSACTION_INTERCEPTOR,
+        payload: request,
+      });
+      (this.dependencies.view as ViewPlugin).requestView("/ethereum/confirm-signature");
+      // this.approveTransaction();
     } else {
       next(action);
     }
   };
 
   public reducer(state: SignatureInterceptorPluginState = { requests: [] }, action: any): any {
-    if (action.type === SIGNATURE_INTERCEPTOR) {
+    if (action.type === SIGNATURE_INTERCEPTOR || action.type === TRANSACTION_INTERCEPTOR) {
       return { ...state, requests: [...state.requests, action.payload] };
-    } else if (action.type === SIGNATURE_INTERCEPTOR_CONFIRM) {
+    } else if (action.type === SIGNATURE_INTERCEPTOR_CONFIRM || action.type === TRANSACTION_INTERCEPTOR_CONFIRM) {
       const [current, ...next] = state.requests;
       return { ...state, requests: next, inFlightRequestID: current.originalAction.requestID };
-    } else if (action.type === SIGNATURE_INTERCEPTOR_REJECT) {
+    } else if (action.type === SIGNATURE_INTERCEPTOR_REJECT || action.type === TRANSACTION_INTERCEPTOR_REJECT) {
       const [, ...next] = state.requests;
       return { ...state, requests: next };
     }
@@ -79,8 +99,21 @@ export class SignatureInterceptorPlugin extends ChildPlugin<SignatureInterceptor
 
   public rejectAction(): void {
     const request = this.getState().signatureInterceptor.requests[0];
-    this.dispatch({ type: "PARENT_RESPONSE", requestID: request.requestID, payload: { status: "rejected" } });
+    this.dispatch({ type: PARENT_RESPONSE, requestID: request.requestID, payload: { status: "rejected" } });
     this.dispatch({ type: SIGNATURE_INTERCEPTOR_REJECT, payload: request.requestID });
+    (this.dependencies.view as ViewPlugin).completeView();
+  }
+
+  public approveTransaction(): void {
+    const request = this.getState().signatureInterceptor.requests[0];
+    this.dispatch({ type: TRANSACTION_INTERCEPTOR_CONFIRM, payload: request.requestID });
+    this.dispatch(request.originalAction);
+  }
+
+  public rejectTransaction(): void {
+    const request = this.getState().signatureInterceptor.requests[0];
+    this.dispatch({ type: PARENT_RESPONSE, requestID: request.requestID, payload: { status: "rejected" } });
+    this.dispatch({ type: TRANSACTION_INTERCEPTOR_REJECT, payload: request.requestID });
     (this.dependencies.view as ViewPlugin).completeView();
   }
 }
