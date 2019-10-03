@@ -8,6 +8,13 @@ import { ReachRouterPlugin } from "./ReachRouterPlugin";
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
+html {
+    box-sizing: border-box;
+}
+*, :after, :before {
+  box-sizing: inherit;
+}
+
 .por_portis-widget-frame {
   top: 0 !important;
   bottom: auto !important;

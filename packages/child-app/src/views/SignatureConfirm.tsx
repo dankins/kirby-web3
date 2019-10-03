@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CoreContext, useSelector } from "@kirby-web3/child-react";
+import { CoreContext, useSelector, CenteredPage } from "@kirby-web3/child-react";
 import { SignatureInterceptorPlugin } from "@kirby-web3/plugin-ethereum";
 import { RouteComponentProps } from "@reach/router";
 
@@ -14,13 +14,13 @@ export const SignatureConfirm: React.FunctionComponent<RouteComponentProps> = ()
   });
 
   return (
-    <div>
+    <CenteredPage>
       <small>signature requested:</small>
       <div>{plaintext}</div>
       <div>
         <button onClick={() => sig.approveAction()}>approve</button>
         <button onClick={() => sig.rejectAction()}>reject</button>
       </div>
-    </div>
+    </CenteredPage>
   );
 };
