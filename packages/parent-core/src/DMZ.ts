@@ -30,6 +30,7 @@ export type DMZMessageType = ReceivedChildMessage | IFrameStatusChange;
 export interface DMZConfig {
   targetOrigin: string;
   iframeSrc: string;
+  iframeStyleOveride: string;
 }
 
 export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
@@ -41,11 +42,47 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   private startQueue: any[] = [];
 
   public async startup(): Promise<void> {
+    const styleElem = document.createElement("style");
+    styleElem.innerHTML =
+      this.config.iframeStyleOveride ||
+      `
+      .kirby {
+        display: none;
+      }
+      .kirby.kirby__visible {
+        display: block;
+        border: none;
+        position: fixed;
+        top: 0px;
+        z-index: 10000000;
+      }
+
+      @media (min-width: 600px) {
+        .kirby.kirby__visible {
+          right: 0px;
+          width: 410px;
+          height: 1000px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .kirby.kirby__visible {
+          left: 0px;
+          width: 100%;
+          height: 100%;
+        }
+
+      }
+    `;
+    document.getElementsByTagName("head")[0].appendChild(styleElem);
+
     this.dispatch({ type: IFRAME_STATUS_CHANGE, payload: IFrameStatus.LOADING });
     const body = document.getElementsByTagName("BODY")[0];
     const iframe = document.createElement("iframe");
     this.iframeElement = iframe;
     iframe.src = this.config.iframeSrc;
+    iframe.classList.add("kirby");
+
     this.hideChild();
 
     iframe.onload = () => {
@@ -126,19 +163,10 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   };
 
   public showChild(request: any): void {
-    const style = `
-    border: none;
-    position: fixed;
-    top: 0px;
-    right: 0px;
-    width: 500px;
-    height: 1000px;
-    z-index: 10000000;
-    `;
-    this.iframeElement.setAttribute("style", style);
+    this.iframeElement.classList.add("kirby__visible");
   }
   public hideChild(): void {
-    this.iframeElement.setAttribute("style", "display: none");
+    this.iframeElement.classList.remove("kirby__visible");
   }
   public async send(message: any): Promise<any> {
     const requestID = this.generateRequestID();
