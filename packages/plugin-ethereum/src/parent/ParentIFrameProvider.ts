@@ -13,7 +13,7 @@ export class ParentIFrameProvider {
   }
 
   public updateReadOnlyProvider(readOnlyRPCUrl: string): void {
-    console.log("updateReadOnlyProvider", readOnlyRPCUrl);
+    this.logger("updateReadOnlyProvider", readOnlyRPCUrl);
     if (readOnlyRPCUrl.startsWith("ws")) {
       this.readOnlyProvider = new WebWsProvider(readOnlyRPCUrl);
     } else {
@@ -88,15 +88,25 @@ export class ParentIFrameProvider {
 
   private async iframeMessage(method: string, callback?: (err: any, data: any) => any, ...params: any): Promise<any> {
     this.logger("iframeMessage request:", method, params);
-    const response = await this.dmz.send({ type: "WEB3_REQUEST", data: { method, params } });
-    this.logger("iframeMessage response", response);
-    if (callback) {
-      try {
-        callback(null, response);
-      } catch (err) {
-        console.error("error in callback", err);
+    try {
+      const response = await this.dmz.send({ type: "WEB3_REQUEST", data: { method, params } });
+      this.logger("iframeMessage response", response);
+      if (callback) {
+        try {
+          callback(null, response);
+        } catch (err) {
+          console.error("error in callback", err);
+        }
+      }
+      return response.data;
+    } catch (err) {
+      if (callback) {
+        try {
+          callback(err, null);
+        } catch (err) {
+          console.error("error in callback", err);
+        }
       }
     }
-    return response.data;
   }
 }

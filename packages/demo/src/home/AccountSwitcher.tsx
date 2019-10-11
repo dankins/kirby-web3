@@ -12,7 +12,11 @@ export const AccountSwitcher = () => {
   }
 
   async function changeAccount(): Promise<void> {
-    return kirby.ethereum.changeAccount();
+    try {
+      await kirby.ethereum.changeAccount();
+    } catch (err) {
+      console.log("error changing account", err);
+    }
   }
 
   return (
