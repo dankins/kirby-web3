@@ -1,6 +1,13 @@
 import { ParentPlugin } from "./ParentPlugin";
 import { MiddlewareAPI, Action, Dispatch } from "redux";
-import { CHILD_SHOW_VIEW, ChildToParentMessage, CHILD_RESPONSE, CHILD_HIDE_VIEW } from "@kirby-web3/common";
+import {
+  CHILD_SHOW_VIEW,
+  ChildToParentMessage,
+  CHILD_RESPONSE,
+  CHILD_HIDE_VIEW,
+  PARENT_OUTSIDE_CLICK,
+  CHILD_REJECT_REQUEST,
+} from "@kirby-web3/common";
 
 // redux action types
 export const MESSAGE_FROM_CHILD = "MESSAGE_FROM_CHILD";
@@ -82,6 +89,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
     this.iframeElement = iframe;
     iframe.src = this.config.iframeSrc;
     iframe.classList.add("kirby");
+    this.setupClickListener();
 
     this.hideChild();
 
@@ -121,23 +129,41 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
       switch (message.type) {
         case CHILD_RESPONSE: {
           this.logger("CHILD_RESPONSE", message);
-          const requestID = message.requestID;
-          const subscriber = this.subscribers[requestID];
+          const subscriber = this.subscribers[message.requestID];
           subscriber.map(async (sub, idx) => {
             try {
-              const result = await sub.callback(message.payload);
+              const result = sub.callback(message.payload);
+
               if (sub.resolve) {
                 sub.resolve(result);
               }
+
               delete subscriber[idx];
             } catch (err) {
               console.error("error", err);
               sub.reject(err);
             }
           });
-          delete this.subscribers[requestID];
+          delete this.subscribers[message.requestID];
           break;
         }
+        case CHILD_REJECT_REQUEST:
+          this.logger("CHILD_REJECT_REQUEST", message);
+          const subscriber1 = this.subscribers[message.requestID];
+          subscriber1.map(async (sub, idx) => {
+            try {
+              const result = sub.callback(message.payload);
+              if (sub.reject) {
+                sub.reject(result);
+              }
+              delete subscriber1[idx];
+            } catch (err) {
+              console.error("error", err);
+              sub.reject(err);
+            }
+          });
+          delete this.subscribers[message.requestID];
+          break;
         case CHILD_SHOW_VIEW: {
           this.showChild(message.payload);
           break;
@@ -222,5 +248,19 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   private generateRequestID(): number {
     this.nextRequestID++;
     return this.nextRequestID;
+  }
+
+  private setupClickListener(): void {
+    const outsideClickListener = (event: any) => {
+      if (this.iframeElement.contains(event.target)) {
+        return;
+      }
+
+      if (this.iframeElement.classList.contains("kirby__visible")) {
+        this.logger("received click outside of child");
+        this.iframe!.postMessage({ type: PARENT_OUTSIDE_CLICK }, this.config.targetOrigin);
+      }
+    };
+    document.addEventListener("click", outsideClickListener);
   }
 }

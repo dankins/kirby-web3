@@ -201,4 +201,9 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
 
     return new BurnerProvider({ rpcUrl, privateKey: pk });
   }
+
+  public cancelEnableWeb3(requestID: number): void {
+    const iframePlugin = this.dependencies.iframe as ParentHandler;
+    iframePlugin.reject(requestID, "cancelled");
+  }
 }

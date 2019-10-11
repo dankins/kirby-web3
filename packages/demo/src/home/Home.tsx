@@ -40,10 +40,14 @@ export const Home: React.FunctionComponent<RouteComponentProps> = () => {
 
   async function requestSign(): Promise<any> {
     const web3 = kirby!.web3;
-    const result = await web3.eth.personal.sign("hello", account);
-    console.log("signature:", result);
-    setSignature(result);
-    return result;
+    try {
+      const result = await web3.eth.personal.sign("hello", account);
+      console.log("signature:", result);
+      setSignature(result);
+    } catch (err) {
+      console.log("Request rejected", err);
+      setSignature("request rejected");
+    }
   }
 
   React.useEffect(() => {

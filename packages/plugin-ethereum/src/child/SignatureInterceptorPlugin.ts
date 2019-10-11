@@ -1,4 +1,4 @@
-import { ChildPlugin, ViewPlugin, PARENT_REQUEST, PARENT_RESPONSE } from "@kirby-web3/child-core";
+import { ChildPlugin, ViewPlugin, PARENT_REQUEST, PARENT_RESPONSE, ParentHandler } from "@kirby-web3/child-core";
 import { MiddlewareAPI, Action, Dispatch } from "redux";
 import * as webUtils from "web3-utils";
 
@@ -40,7 +40,7 @@ export interface SignatureInterceptorPluginConfig {
 }
 export class SignatureInterceptorPlugin extends ChildPlugin<SignatureInterceptorPluginConfig> {
   public name = "signatureInterceptor";
-  public dependsOn = ["ethereum", "view"];
+  public dependsOn = ["ethereum", "iframe", "view"];
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     const inFlightRequestID = api.getState().signatureInterceptor.inFlightRequestID;
@@ -99,20 +99,20 @@ export class SignatureInterceptorPlugin extends ChildPlugin<SignatureInterceptor
 
   public rejectAction(): void {
     const request = this.getState().signatureInterceptor.requests[0];
-    this.dispatch({ type: PARENT_RESPONSE, requestID: request.requestID, payload: { status: "rejected" } });
+    (this.dependencies.iframe as ParentHandler).reject(request.originalAction.requestID, "rejected");
     this.dispatch({ type: SIGNATURE_INTERCEPTOR_REJECT, payload: request.requestID });
     (this.dependencies.view as ViewPlugin).completeView();
   }
 
   public approveTransaction(): void {
     const request = this.getState().signatureInterceptor.requests[0];
-    this.dispatch({ type: TRANSACTION_INTERCEPTOR_CONFIRM, payload: request.requestID });
+    this.dispatch({ type: TRANSACTION_INTERCEPTOR_CONFIRM, payload: request.originalAction.requestID });
     this.dispatch(request.originalAction);
   }
 
   public rejectTransaction(): void {
     const request = this.getState().signatureInterceptor.requests[0];
-    this.dispatch({ type: PARENT_RESPONSE, requestID: request.requestID, payload: { status: "rejected" } });
+    (this.dependencies.iframe as ParentHandler).reject(request.originalAction.requestID, "rejected");
     this.dispatch({ type: TRANSACTION_INTERCEPTOR_REJECT, payload: request.requestID });
     (this.dependencies.view as ViewPlugin).completeView();
   }

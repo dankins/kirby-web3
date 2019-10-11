@@ -1,4 +1,7 @@
 import { ChildPlugin } from "./ChildPlugin";
+import { PARENT_MESSAGE } from "./ParentHandler";
+import { PARENT_OUTSIDE_CLICK } from "@kirby-web3/common";
+import { MiddlewareAPI, Action, Dispatch } from "redux";
 
 export const REQUEST_VIEW_ACTION = "REQUEST_VIEW_ACTION";
 export const COMPLETE_VIEW_ACTION = "COMPLETE_VIEW_ACTION";
@@ -29,6 +32,14 @@ export interface ViewState {
 
 export class ViewPlugin extends ChildPlugin<any, ViewPluginActions> {
   public name = "view";
+  private outsideClickHandler?: () => void;
+
+  public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
+    if (action.type === PARENT_MESSAGE && action.payload.type === PARENT_OUTSIDE_CLICK) {
+      this.handleOutsideClick();
+    }
+    next(action);
+  };
 
   public reducer(state: any = { queue: [] }, action: any): ViewState {
     switch (action.type) {
@@ -48,5 +59,19 @@ export class ViewPlugin extends ChildPlugin<any, ViewPluginActions> {
 
   public completeView(): void {
     this.dispatch({ type: COMPLETE_VIEW_ACTION });
+  }
+
+  public onParentClick(cb: () => void): void {
+    this.outsideClickHandler = cb;
+  }
+
+  public cleanupView(): void {
+    this.outsideClickHandler = undefined;
+  }
+
+  private handleOutsideClick(): void {
+    if (this.outsideClickHandler) {
+      this.outsideClickHandler();
+    }
   }
 }

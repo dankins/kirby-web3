@@ -22,6 +22,16 @@ export const Web3Enable: React.FC<Web3EnableProps> = ({ network }) => {
       return state.view.queue[0].requestID;
     }
   });
+
+  React.useEffect(() => {
+    if (requestID) {
+      (ctx.core.plugins.view as ViewPlugin).onParentClick(() => {
+        (ctx.core.plugins.ethereum as EthereumChildPlugin).cancelEnableWeb3(requestID);
+        (ctx.core.plugins.view as ViewPlugin).completeView();
+      });
+    }
+  }, [ctx, requestID]);
+
   function selection(provider: string): void {
     console.log("selected:", provider);
     (ctx.core.plugins.ethereum as EthereumChildPlugin).enableWeb3(requestID, provider, network as any).catch(err => {

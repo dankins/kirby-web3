@@ -7,12 +7,14 @@ import {
   CHILD_ALIVE,
   CHILD_HIDE_VIEW,
   SEND_TO_PARENT,
+  CHILD_REJECT_REQUEST,
 } from "@kirby-web3/common";
 import { ChildPlugin } from "./ChildPlugin";
 import { REQUEST_VIEW_ACTION, COMPLETE_VIEW_ACTION } from "./ViewPlugin";
 
 export const PARENT_RESPONSE = "PARENT_RESPONSE";
 export const PARENT_REQUEST = "PARENT_REQUEST";
+export const PARENT_MESSAGE = "PARENT_MESSAGE";
 export const SITE_PREFERENCE_CHANGE = "SITE_PREFERENCE_CHANGE";
 
 const COOKIE_SITE_PREFERENCE_PREFIX = "kirby:site_preference:";
@@ -28,6 +30,10 @@ export interface ParentRequestAction {
   requestID: number;
   data: any;
 }
+export interface ParentMessageAction {
+  type: typeof PARENT_MESSAGE;
+  payload: any;
+}
 
 export interface SitePreferences {
   [key: string]: any;
@@ -37,7 +43,11 @@ export interface SitePreferenceChange {
   payload: SitePreferences;
 }
 
-export type ParentHandlerActions = ParentResponseAction | ParentRequestAction | SitePreferenceChange;
+export type ParentHandlerActions =
+  | ParentResponseAction
+  | ParentMessageAction
+  | ParentRequestAction
+  | SitePreferenceChange;
 
 export type Config = any;
 export interface ParentHandlerState {
@@ -86,6 +96,11 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
           type: PARENT_REQUEST,
           requestID: message.data.requestID,
           data: message.data.request,
+        });
+      } else {
+        this.dispatch({
+          type: PARENT_MESSAGE,
+          payload: message.data,
         });
       }
     }
@@ -139,6 +154,10 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
 
   public respond(requestID: number, payload: any): void {
     this.dispatch({ type: PARENT_RESPONSE, requestID, payload });
+  }
+
+  public reject(requestID: number, payload: any): void {
+    parent.postMessage({ type: CHILD_REJECT_REQUEST, requestID, payload }, this.parentDomain);
   }
 
   public setSitePreference(key: string, value: any): void {
