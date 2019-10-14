@@ -13,6 +13,7 @@ export enum ProviderTypes {
   BURNER = "Burner Wallet",
   PORTIS = "Portis",
   METAMASK = "MetaMask",
+  READONLY = "Read Only",
 }
 
 export type Network = "mainnet" | "rinkeby" | "ropsten";

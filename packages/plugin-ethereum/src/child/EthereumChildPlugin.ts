@@ -3,17 +3,21 @@ import { MiddlewareAPI, Action, Dispatch } from "redux";
 import * as BurnerProvider from "burner-provider";
 import { ethers } from "ethers";
 
+import Web3 = require("web3");
+import WebWsProvider = require("web3-providers-ws");
+import Web3HttpProvider = require("web3-providers-http");
+
 import {
   ChildPlugin,
   REQUEST_VIEW_ACTION,
   ParentHandler,
   PARENT_REQUEST,
   PARENT_RESPONSE,
+  COMPLETE_VIEW_ACTION,
 } from "@kirby-web3/child-core";
 import { SEND_TO_PARENT } from "@kirby-web3/common";
 
 import { ChildIFrameProvider } from "./ChildIFrameProvider";
-import Web3 = require("web3");
 import { ETHEREUM_WEB3_CHANGE_ACCOUNT, ETHEREUM_WEB3_CHANGE_NETWORK, ProviderTypes, Network } from "../common";
 
 export interface EthereumChildPluginState {
@@ -78,20 +82,13 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       const providerType =
         iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE") ||
         (this.config.burnerPreference === "always" && ProviderTypes.BURNER);
-      if (providerType) {
-        // site has previously enabled web3, so return the saved type
-        this.enableWeb3(action.requestID, providerType, this.config.defaultNetwork).catch(err => {
-          console.log("unable to activate web3:", err);
-        });
-      } else {
-        this.dispatch({
-          type: REQUEST_VIEW_ACTION,
-          payload: {
-            route: "/ethereum/web3enable/" + this.config.defaultNetwork,
-            requestID: action.requestID,
-          },
-        });
-      }
+      this.dispatch({
+        type: REQUEST_VIEW_ACTION,
+        payload: {
+          route: `/ethereum/web3enable/${this.config.defaultNetwork}?providerPreference=${providerType}`,
+          requestID: action.requestID,
+        },
+      });
       return;
     } else if (action.type === "PARENT_REQUEST" && action.data.type === ETHEREUM_WEB3_CHANGE_ACCOUNT) {
       this.dispatch({
@@ -143,10 +140,22 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       }
     } else if (providerType === ProviderTypes.PORTIS) {
       const portis = new Portis(this.config.portis!.appID, network);
+      // const portis = new Portis(this.config.portis!.appID, {
+      //   nodeUrl: this.getRPCUrl(network),
+      //   chainId: NetworkID[network],
+      // });
       concreteProvider = portis.provider;
+      this.setupPortisEffects(portis);
     } else if (providerType === ProviderTypes.BURNER) {
       const burnerProvider = this.getBurnerProvider(network);
       concreteProvider = burnerProvider;
+    } else if (providerType === ProviderTypes.READONLY) {
+      const readOnlyRPCUrl = this.getRPCUrl(network);
+      if (readOnlyRPCUrl.startsWith("ws")) {
+        concreteProvider = new WebWsProvider(readOnlyRPCUrl);
+      } else {
+        concreteProvider = new Web3HttpProvider(readOnlyRPCUrl);
+      }
     } else {
       throw new Error("unrecognized provider: " + providerType);
     }
@@ -194,12 +203,24 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       pk = wallet.privateKey;
     }
 
+    const rpcUrl = this.getRPCUrl(network);
+    return new BurnerProvider({ rpcUrl, privateKey: pk });
+  }
+
+  public getRPCUrl(network: Network): string {
     const rpcUrl = this.config.networks[network];
     if (!rpcUrl) {
-      throw new Error("could not build Burner Provider since there is no RPC URL defined for the network " + network);
+      throw new Error("could not build RPC URL since it is not defined for the network " + network);
     }
 
-    return new BurnerProvider({ rpcUrl, privateKey: pk });
+    return rpcUrl;
+  }
+
+  public setupPortisEffects(portis: typeof Portis): void {
+    this.logger("setting up portis effects");
+    portis.onLogout(async () => {
+      console.log("logged out of portis");
+    });
   }
 
   public cancelEnableWeb3(requestID: number): void {
