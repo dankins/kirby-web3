@@ -181,7 +181,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
       }
     } else if (action.type === IFRAME_STATUS_CHANGE && action.payload === IFrameStatus.READY) {
       if (this.startQueue.length > 0) {
-        this.logger("sending queued messages", action, this.startQueue, this.iframe);
+        this.logger("sending queued messages");
         this.startQueue.map(msg => this.iframe!.postMessage(msg, this.config.targetOrigin));
       }
     }
