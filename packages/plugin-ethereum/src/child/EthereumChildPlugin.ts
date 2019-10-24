@@ -83,7 +83,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
         iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE") ||
         (this.config.burnerPreference === "always" && ProviderTypes.BURNER);
 
-      const providerTypeQueryParam = providerType ? "?providerPreference=" + providerType : undefined;
+      const providerTypeQueryParam = providerType ? "?providerPreference=" + providerType : "";
       this.dispatch({
         type: REQUEST_VIEW_ACTION,
         payload: {
