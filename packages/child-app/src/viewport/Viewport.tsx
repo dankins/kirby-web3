@@ -1,5 +1,4 @@
 import * as React from "react";
-import styled from "styled-components";
 import { Router } from "@reach/router";
 
 import { Web3Enable } from "../views/Web3Enable";

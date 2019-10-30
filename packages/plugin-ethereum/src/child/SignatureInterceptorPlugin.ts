@@ -1,4 +1,11 @@
-import { ChildPlugin, ViewPlugin, PARENT_REQUEST, PARENT_RESPONSE, ParentHandler } from "@kirby-web3/child-core";
+import {
+  ChildPlugin,
+  ViewPlugin,
+  PARENT_REQUEST,
+  PARENT_RESPONSE,
+  PARENT_REJECT,
+  ParentHandler,
+} from "@kirby-web3/child-core";
 import { MiddlewareAPI, Action, Dispatch } from "redux";
 import * as webUtils from "web3-utils";
 
@@ -48,7 +55,7 @@ export class SignatureInterceptorPlugin extends ChildPlugin<SignatureInterceptor
     // check if this is the "in-flight" request
     if (inFlightRequestID && action.requestID === inFlightRequestID) {
       next(action);
-      if (action.type === "PARENT_RESPONSE") {
+      if (action.type === PARENT_RESPONSE || action.type === PARENT_REJECT) {
         (this.dependencies.view as ViewPlugin).completeView();
       }
     } else if (isSignatureRequest(action)) {
@@ -72,7 +79,6 @@ export class SignatureInterceptorPlugin extends ChildPlugin<SignatureInterceptor
         payload: request,
       });
       (this.dependencies.view as ViewPlugin).requestView("/ethereum/confirm-signature");
-      // this.approveTransaction();
     } else {
       next(action);
     }
