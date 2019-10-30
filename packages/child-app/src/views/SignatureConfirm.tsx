@@ -1,24 +1,36 @@
 import * as React from "react";
-import { CoreContext, useSelector, CenteredPage } from "@kirby-web3/child-react";
-import { SignatureInterceptorPlugin } from "@kirby-web3/plugin-ethereum";
+import { CoreContext, useSelector as useKirbySelector, CenteredPage } from "@kirby-web3/child-react";
+import { SignatureInterceptorPlugin, ProviderTypes } from "@kirby-web3/plugin-ethereum";
 import { RouteComponentProps } from "@reach/router";
-import { ViewPlugin } from "@kirby-web3/child-core";
 
 export const SignatureConfirm: React.FunctionComponent<RouteComponentProps> = () => {
+  // context
   const ctx = React.useContext(CoreContext);
   const sig = ctx.core.plugins.signatureInterceptor as SignatureInterceptorPlugin;
 
-  React.useEffect(() => {
-    (ctx.core.plugins.view as ViewPlugin).onParentClick(() => {
-      sig.rejectAction();
-    });
-  }, [ctx.core.plugins.view, sig]);
+  // state
+  const [isPending, setPending] = React.useState(false);
 
-  const plaintext = useSelector((state: any) => {
+  // kirby selectors
+  const providerType = useKirbySelector((state: any) => state.ethereum.providerType);
+  const plaintext = useKirbySelector((state: any) => {
     if (state.signatureInterceptor.requests && state.signatureInterceptor.requests[0]) {
       return state.signatureInterceptor.requests[0].plaintext;
     }
   });
+
+  // memos
+  React.useMemo(() => {
+    // these providers will prompt the user through their own UI
+    if ([ProviderTypes.METAMASK, ProviderTypes.PORTIS].indexOf(providerType) > -1) {
+      sig.approveAction();
+      setPending(true);
+    }
+  }, [providerType, sig]);
+
+  if (isPending) {
+    return <></>;
+  }
 
   return (
     <CenteredPage>

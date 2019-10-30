@@ -67,6 +67,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   }
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
+    const iframePlugin = this.dependencies.iframe as ParentHandler;
     if (action.type === PARENT_REQUEST && action.data.type === "WEB3_REQUEST") {
       this.provider
         .handleIFrameMessage(action.data.data)
@@ -76,9 +77,9 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
         })
         .catch(err => {
           this.logger("middleware error: ", err);
+          iframePlugin.reject(action.requestID, err);
         });
     } else if (action.type === PARENT_REQUEST && action.data.type === "WEB3_ENABLE") {
-      const iframePlugin = this.dependencies.iframe as ParentHandler;
       const providerType =
         iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE") ||
         (this.config.burnerPreference === "always" && ProviderTypes.BURNER);

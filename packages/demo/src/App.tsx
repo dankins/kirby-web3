@@ -7,6 +7,7 @@ import { ConnextParentPlugin } from "@kirby-web3/plugin-connext";
 
 import { Connext } from "./connext/Connext";
 import { Home } from "./home/Home";
+import { EthPage } from "./eth/EthPage";
 
 const config = {
   dmz: {
@@ -31,6 +32,7 @@ const App: React.FC = () => {
         <Router>
           <Home path="/" />
           <Connext path="/connext/*" />
+          <EthPage path="/eth/*" />
         </Router>
       </KirbyEthereumProvider>
     </div>

@@ -13,6 +13,7 @@ import { ChildPlugin } from "./ChildPlugin";
 import { REQUEST_VIEW_ACTION, COMPLETE_VIEW_ACTION } from "./ViewPlugin";
 
 export const PARENT_RESPONSE = "PARENT_RESPONSE";
+export const PARENT_REJECT = "PARENT_REJECT";
 export const PARENT_REQUEST = "PARENT_REQUEST";
 export const PARENT_MESSAGE = "PARENT_MESSAGE";
 export const SITE_PREFERENCE_CHANGE = "SITE_PREFERENCE_CHANGE";
@@ -20,7 +21,7 @@ export const SITE_PREFERENCE_CHANGE = "SITE_PREFERENCE_CHANGE";
 const COOKIE_SITE_PREFERENCE_PREFIX = "kirby:site_preference:";
 
 export interface ParentResponseAction {
-  type: typeof PARENT_RESPONSE;
+  type: typeof PARENT_RESPONSE | typeof PARENT_REJECT;
   requestID: number;
   payload: any;
 }
@@ -158,6 +159,7 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
 
   public reject(requestID: number, payload: any): void {
     parent.postMessage({ type: CHILD_REJECT_REQUEST, requestID, payload }, this.parentDomain);
+    this.dispatch({ type: PARENT_REJECT, requestID, payload });
   }
 
   public setSitePreference(key: string, value: any): void {
