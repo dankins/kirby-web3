@@ -62,9 +62,11 @@ export interface ParentHandlerState {
 export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, ParentHandlerActions> {
   public name = "iframe";
   public parentDomain: string;
+  public canUseLocalStorage: boolean;
 
   public constructor() {
     super();
+    this.canUseLocalStorage = localStorageAvailable();
 
     // initialize parent listener
     let parentDomain: string;
@@ -166,7 +168,19 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
     const state = this.getState().iframe as ParentHandlerState;
     const prefs = state.sitePreferences;
     prefs[key] = value;
-    Cookies.set(COOKIE_SITE_PREFERENCE_PREFIX + this.parentDomain, JSON.stringify(prefs));
+    const storageKey = COOKIE_SITE_PREFERENCE_PREFIX + this.parentDomain;
+    const storageValue = JSON.stringify(prefs);
+    if (this.canUseLocalStorage) {
+      window.localStorage.setItem(storageKey, storageValue);
+    } else {
+      // fallback to using a cookie
+      Cookies.set(storageKey, storageValue, {
+        // @ts-ignore: TS thinks this property doesn't exist, but it does
+        sameSite: "none",
+        expires: 365,
+      });
+    }
+
     this.dispatch({ type: SITE_PREFERENCE_CHANGE, payload: prefs });
   }
 
@@ -178,7 +192,13 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
   }
 
   private loadSitePreferences(): SitePreferences {
-    const prefs = Cookies.get(COOKIE_SITE_PREFERENCE_PREFIX + this.parentDomain);
+    const key = COOKIE_SITE_PREFERENCE_PREFIX + this.parentDomain;
+    let prefs = null;
+    if (this.canUseLocalStorage) {
+      prefs = window.localStorage.getItem(key);
+    } else {
+      prefs = Cookies.get(key);
+    }
     if (!prefs) {
       return {};
     }
@@ -190,5 +210,36 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
       console.error("error parsing site preferences", prefs);
       return {};
     }
+  }
+}
+function localStorageAvailable(): boolean {
+  return storageAvailable("localStorage");
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Feature-detecting_localStorage
+function storageAvailable(type: string): boolean {
+  let storage;
+  try {
+    // @ts-ignore
+    storage = window[type];
+    const x = "__storage_test__";
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  } catch (e) {
+    return (
+      e instanceof DOMException &&
+      // everything except Firefox
+      (e.code === 22 ||
+        // Firefox
+        e.code === 1014 ||
+        // test name field too, because code might not be present
+        // everything except Firefox
+        e.name === "QuotaExceededError" ||
+        // Firefox
+        e.name === "NS_ERROR_DOM_QUOTA_REACHED") &&
+      // acknowledge QuotaExceededError only if there's something already stored
+      (storage && storage.length !== 0)
+    );
   }
 }
