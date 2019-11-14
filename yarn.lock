@@ -2290,11 +2290,32 @@
     once "^1.4.0"
     universal-user-agent "^4.0.0"
 
-"@portis/web3-provider-engine@1.0.10":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@portis/web3-provider-engine/-/web3-provider-engine-1.0.10.tgz#7287010948785dbb284d9fc32ca3954a52eeff44"
-  integrity sha512-fJlpZigMwXCPT6+RL/yRXao2+iAK9C1qZmyfQqXk2mw+oxGELImnBKYDAE15hoTTkFWvJ3yxbYdAwp/XOU4BWw==
+"@portis/eth-json-rpc-middleware@^4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@portis/eth-json-rpc-middleware/-/eth-json-rpc-middleware-4.1.2.tgz#391e392da03dea348c8111a8111ce4550aa24a02"
+  integrity sha512-LUV0JgV6jphhfmYyElpFYfEzKhxaW2VYB/trWJK7+68s4PNyMMYR94hheXRh9T2lBomSVpdbySfYxjWVLAMKwA==
   dependencies:
+    btoa "^1.2.1"
+    clone "^2.1.1"
+    eth-query "^2.1.2"
+    eth-sig-util "^1.4.2"
+    ethereumjs-block "^1.6.0"
+    ethereumjs-tx "^1.3.3"
+    ethereumjs-util "^5.1.2"
+    ethereumjs-vm "2.2.2"
+    fetch-ponyfill "^4.0.0"
+    json-rpc-engine "^5.0.0"
+    json-rpc-error "^2.0.0"
+    json-stable-stringify "^1.0.1"
+    pify "^3.0.0"
+    safe-event-emitter "^1.0.1"
+
+"@portis/web3-provider-engine@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@portis/web3-provider-engine/-/web3-provider-engine-1.1.0.tgz#4e502fe363dd5156505ea54a5c902537944b9cf5"
+  integrity sha512-443QwQqgO/D0gEn7voMfo/dBc0SNzvJ4vVSOUJj1r2W9MsN3f5HeU2wDeXLc8bQryGsmemBxmghK/G+XQTXA6w==
+  dependencies:
+    "@portis/eth-json-rpc-middleware" "^4.1.2"
     async "^2.5.0"
     backoff "^2.5.0"
     clone "^2.0.0"
@@ -2302,7 +2323,6 @@
     eth-block-tracker "^4.2.0"
     eth-json-rpc-filters "^4.0.2"
     eth-json-rpc-infura "^3.1.0"
-    eth-json-rpc-middleware "github:radotzki/eth-json-rpc-middleware#patch-1"
     eth-sig-util "^1.4.2"
     ethereumjs-block "^1.2.2"
     ethereumjs-tx "^1.2.0"
@@ -2318,12 +2338,12 @@
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-"@portis/web3@^2.0.0-beta.36":
-  version "2.0.0-beta.41"
-  resolved "https://registry.yarnpkg.com/@portis/web3/-/web3-2.0.0-beta.41.tgz#eda6ab11119a4ebd242ad3d723f0098f59ab36a4"
-  integrity sha512-tpzYkaG9cu//BVR+91zKwZk4A37ghUpnYm9B3bsQik7OsttyOjApCm6joIyzOKOj9d9NLVPmc0Zge0bPWKQAlg==
+"@portis/web3@^2.0.0-beta.54":
+  version "2.0.0-beta.54"
+  resolved "https://registry.yarnpkg.com/@portis/web3/-/web3-2.0.0-beta.54.tgz#a46f21375bec90bb247f66e9fde776d863a6f25b"
+  integrity sha512-BrhlbEXUEtlJhElXMI32S8q/2hzQpuGNRLsRxEURxonWkDMzK/CjtpKO2ACoJ205Y96lMH4S3xQB0Vuc8dC/WQ==
   dependencies:
-    "@portis/web3-provider-engine" "1.0.10"
+    "@portis/web3-provider-engine" "1.1.0"
     ethereumjs-util "5.2.0"
     penpal "3.0.7"
     pocket-js-core "0.0.3"
@@ -7677,25 +7697,6 @@ eth-json-rpc-middleware@^4.1.4, eth-json-rpc-middleware@^4.1.5:
     pify "^3.0.0"
     safe-event-emitter "^1.0.1"
 
-"eth-json-rpc-middleware@github:radotzki/eth-json-rpc-middleware#patch-1":
-  version "4.1.2"
-  resolved "https://codeload.github.com/radotzki/eth-json-rpc-middleware/tar.gz/8acc43df4a8c0c7f6d212af9163d379211dad4c7"
-  dependencies:
-    btoa "^1.2.1"
-    clone "^2.1.1"
-    eth-query "^2.1.2"
-    eth-sig-util "^1.4.2"
-    ethereumjs-block "^1.6.0"
-    ethereumjs-tx "^1.3.3"
-    ethereumjs-util "^5.1.2"
-    ethereumjs-vm "2.2.2"
-    fetch-ponyfill "^4.0.0"
-    json-rpc-engine "^5.0.0"
-    json-rpc-error "^2.0.0"
-    json-stable-stringify "^1.0.1"
-    pify "^3.0.0"
-    safe-event-emitter "^1.0.1"
-
 eth-lib@0.2.7:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/eth-lib/-/eth-lib-0.2.7.tgz#2f93f17b1e23aec3759cd4a3fe20c1286a3fc1ca"
@@ -7904,26 +7905,10 @@ ethereumjs-vm@^2.1.0, ethereumjs-vm@^2.3.4, ethereumjs-vm@^2.6.0:
     rustbn.js "~0.2.0"
     safe-buffer "^5.1.1"
 
-ethers@4.0.0-beta.3:
-  version "4.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.0-beta.3.tgz#15bef14e57e94ecbeb7f9b39dd0a4bd435bc9066"
-  integrity sha512-YYPogooSknTwvHg3+Mv71gM/3Wcrx+ZpCzarBj3mqs9njjRkrOo2/eufzhHloOCo3JSoNI4TQJJ6yU5ABm3Uog==
-  dependencies:
-    "@types/node" "^10.3.2"
-    aes-js "3.0.0"
-    bn.js "^4.4.0"
-    elliptic "6.3.3"
-    hash.js "1.1.3"
-    js-sha3 "0.5.7"
-    scrypt-js "2.0.3"
-    setimmediate "1.0.4"
-    uuid "2.0.1"
-    xmlhttprequest "1.8.0"
-
-ethers@^4.0.36, ethers@^4.0.37:
-  version "4.0.37"
-  resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.37.tgz#dfa70d59498663878c5e4a977d14356660ca5b90"
-  integrity sha512-B7bDdyQ45A5lPr6k2HOkEKMtYOuqlfy+nNf8glnRvWidkDQnToKw1bv7UyrwlbsIgY2mE03UxTVtouXcT6Vvcw==
+ethers@4.0.0-beta.3, ethers@^4.0.33, ethers@^4.0.36, ethers@^4.0.37:
+  version "4.0.39"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.39.tgz#5ce9dfffedb03936415743f63b37d96280886a47"
+  integrity sha512-QVtC8TTUgTrnlQjQvdFJ7fkSWKwp8HVTbKRmrdbVryrPzJHMTf3WSeRNvLF2enGyAFtyHJyFNnjN0fSshcEr9w==
   dependencies:
     "@types/node" "^10.3.2"
     aes-js "3.0.0"
@@ -16947,11 +16932,6 @@ schema-utils@^2.0.0, schema-utils@^2.0.1:
   dependencies:
     ajv "^6.10.2"
     ajv-keywords "^3.4.1"
-
-scrypt-js@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-2.0.3.tgz#bb0040be03043da9a012a2cea9fc9f852cfc87d4"
-  integrity sha1-uwBAvgMEPamgEqLOqfyfhSz8h9Q=
 
 scrypt-js@2.0.4:
   version "2.0.4"

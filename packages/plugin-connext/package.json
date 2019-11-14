@@ -14,8 +14,6 @@
     "@kirby-web3/common": "^1.0.0",
     "@kirby-web3/parent-core": "^1.0.0",
     "@kirby-web3/plugin-ethereum": "^1.0.0",
-    "@portis/web3": "^2.0.0-beta.36",
-    "burner-provider": "^1.0.5",
     "debug": "^4.1.1",
     "ethers": "^4.0.36",
     "redux": "^4.0.4",
