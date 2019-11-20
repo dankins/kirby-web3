@@ -196,11 +196,12 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   }
   public async send(message: any): Promise<any> {
     const requestID = this.generateRequestID();
+    const msg = { kirby: "parent", requestID, request: message };
     if (!this.iframe) {
-      this.startQueue.push({ requestID, request: message });
+      this.startQueue.push(msg);
     } else {
       this.logger(`sending message to child iframe`, { requestID, request: message });
-      this.iframe!.postMessage({ requestID, request: message }, this.config.targetOrigin);
+      this.iframe!.postMessage(msg, this.config.targetOrigin);
     }
 
     return this.waitForResponse(requestID, response => {
@@ -237,7 +238,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
   }
 
   private handleMessage(message: any): void {
-    if (message.origin === this.config.targetOrigin) {
+    if (message.origin === this.config.targetOrigin && message.data && message.data.kirby === "child") {
       this.dispatch({
         type: MESSAGE_FROM_CHILD,
         payload: message.data,
@@ -258,7 +259,7 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
 
       if (this.iframeElement.classList.contains("kirby__visible")) {
         this.logger("received click outside of child");
-        this.iframe!.postMessage({ type: PARENT_OUTSIDE_CLICK }, this.config.targetOrigin);
+        this.iframe!.postMessage({ kirby: "parent", type: PARENT_OUTSIDE_CLICK }, this.config.targetOrigin);
       }
     };
     document.addEventListener("click", outsideClickListener);

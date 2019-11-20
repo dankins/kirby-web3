@@ -93,7 +93,7 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
   }
 
   public async handleMessage(message: any): Promise<void> {
-    if (message.origin === this.parentDomain) {
+    if (message.origin === this.parentDomain && message.data && message.data.kirby === "parent") {
       if (message.data.requestID) {
         this.dispatch({
           type: PARENT_REQUEST,
@@ -152,15 +152,15 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
   }
 
   public sendToParent(message: ChildToParentMessage): void {
-    parent.postMessage(message, this.parentDomain);
+    parent.postMessage({ kirby: "child", ...message }, this.parentDomain);
   }
 
   public respond(requestID: number, payload: any): void {
-    this.dispatch({ type: PARENT_RESPONSE, requestID, payload });
+    this.dispatch({ kirby: "child", type: PARENT_RESPONSE, requestID, payload });
   }
 
   public reject(requestID: number, payload: any): void {
-    parent.postMessage({ type: CHILD_REJECT_REQUEST, requestID, payload }, this.parentDomain);
+    parent.postMessage({ kirby: "child", type: CHILD_REJECT_REQUEST, requestID, payload }, this.parentDomain);
     this.dispatch({ type: PARENT_REJECT, requestID, payload });
   }
 
