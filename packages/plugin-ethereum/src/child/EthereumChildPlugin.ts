@@ -1,4 +1,3 @@
-import * as Portis from "@portis/web3";
 import { MiddlewareAPI, Action, Dispatch } from "redux";
 import * as BurnerProvider from "burner-provider";
 import { ethers } from "ethers";
@@ -7,14 +6,7 @@ import Web3 = require("web3");
 import WebWsProvider = require("web3-providers-ws");
 import Web3HttpProvider = require("web3-providers-http");
 
-import {
-  ChildPlugin,
-  REQUEST_VIEW_ACTION,
-  ParentHandler,
-  PARENT_REQUEST,
-  PARENT_RESPONSE,
-  COMPLETE_VIEW_ACTION,
-} from "@kirby-web3/child-core";
+import { ChildPlugin, ParentHandler, PARENT_REQUEST, PARENT_RESPONSE, ViewPlugin } from "@kirby-web3/child-core";
 import { SEND_TO_PARENT } from "@kirby-web3/common";
 
 import { ChildIFrameProvider } from "./ChildIFrameProvider";
@@ -42,7 +34,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   public name = "ethereum";
   public provider!: ChildIFrameProvider;
   public web3: typeof Web3;
-  public dependsOn = ["iframe"];
+  public dependsOn = ["iframe", "view"];
 
   public async startup(): Promise<void> {
     this.provider = new ChildIFrameProvider(event => {
@@ -68,6 +60,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
     const iframePlugin = this.dependencies.iframe as ParentHandler;
+    const viewPlugin = this.dependencies.view as ViewPlugin;
     if (action.type === PARENT_REQUEST && action.data.type === "WEB3_REQUEST") {
       this.provider
         .handleIFrameMessage(action.data.data)
@@ -84,22 +77,16 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
         iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE") ||
         (this.config.burnerPreference === "always" && ProviderTypes.BURNER);
 
-      const providerTypeQueryParam = providerType ? "?providerPreference=" + providerType : "";
-      this.dispatch({
-        type: REQUEST_VIEW_ACTION,
-        payload: {
-          route: `/ethereum/web3enable/${this.config.defaultNetwork}${providerTypeQueryParam}`,
-          requestID: action.requestID,
-        },
+      viewPlugin.requestView("/ethereum/web3enable", {
+        network: this.config.defaultNetwork,
+        providerPreference: providerType,
+        requestID: action.requestID,
       });
       return;
     } else if (action.type === "PARENT_REQUEST" && action.data.type === ETHEREUM_WEB3_CHANGE_ACCOUNT) {
-      this.dispatch({
-        type: REQUEST_VIEW_ACTION,
-        payload: {
-          route: "/ethereum/web3enable/" + api.getState().ethereum.network,
-          requestID: action.requestID,
-        },
+      viewPlugin.requestView("/ethereum/web3enable", {
+        network: api.getState().ethereum.network,
+        requestID: action.requestID,
       });
       return;
     } else if (action.type === "PARENT_REQUEST" && action.data.type === ETHEREUM_WEB3_CHANGE_NETWORK) {
@@ -142,6 +129,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
         throw new Error("no injected web3 provided");
       }
     } else if (providerType === ProviderTypes.PORTIS) {
+      const Portis = await import("@portis/web3");
       const portis = new Portis(this.config.portis!.appID, network);
       // const portis = new Portis(this.config.portis!.appID, {
       //   nodeUrl: this.getRPCUrl(network),
@@ -219,7 +207,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     return rpcUrl;
   }
 
-  public setupPortisEffects(portis: typeof Portis): void {
+  public setupPortisEffects(portis: any): void {
     this.logger("setting up portis effects");
     portis.onLogout(async () => {
       console.log("logged out of portis");

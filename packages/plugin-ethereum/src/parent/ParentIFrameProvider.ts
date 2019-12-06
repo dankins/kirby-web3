@@ -5,7 +5,7 @@ import Web3HttpProvider = require("web3-providers-http");
 
 export class ParentIFrameProvider {
   private dmz: DMZ;
-  private logger = debug("kirby:parent:ParentIFrameProvider");
+  private logger = debug("kirby:parent:ethereum:ParentIFrameProvider");
   private readOnlyProvider: any;
   constructor(dmz: DMZ, readOnlyRPCUrl: string) {
     this.dmz = dmz;

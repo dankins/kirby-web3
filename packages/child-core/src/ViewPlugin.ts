@@ -10,21 +10,15 @@ export interface RequestViewAction {
   type: typeof REQUEST_VIEW_ACTION;
   payload: {
     route: string;
-    requestID: string;
-    dispatchOnComplete?: any;
+    data?: any;
   };
 }
 
 export interface CompleteViewAction {
   type: typeof COMPLETE_VIEW_ACTION;
-  payload: {
-    route: string;
-    requestID: string;
-    dispatchOnComplete?: any;
-  };
 }
 
-export type ViewPluginActions = RequestViewAction;
+export type ViewPluginActions = RequestViewAction | CompleteViewAction;
 
 export interface ViewState {
   queue: any[];
@@ -41,7 +35,7 @@ export class ViewPlugin extends ChildPlugin<any, ViewPluginActions> {
     next(action);
   };
 
-  public reducer(state: any = { queue: [] }, action: any): ViewState {
+  public reducer(state: any = { queue: [] }, action: ViewPluginActions): ViewState {
     switch (action.type) {
       case REQUEST_VIEW_ACTION:
         return { ...state, queue: state.queue.concat(action.payload) };
@@ -53,8 +47,8 @@ export class ViewPlugin extends ChildPlugin<any, ViewPluginActions> {
     return state;
   }
 
-  public requestView(route: string, requestID?: string, dispatchOnComplete?: any): void {
-    this.dispatch({ type: REQUEST_VIEW_ACTION, payload: { route, requestID, dispatchOnComplete } });
+  public requestView(route: string, data?: any): void {
+    this.dispatch({ type: REQUEST_VIEW_ACTION, payload: { route, data } });
   }
 
   public completeView(): void {
