@@ -8,15 +8,11 @@ import {
   useSelector,
   CenteredPage,
 } from "@kirby-web3/child-react";
-import { EthereumChildPlugin } from "@kirby-web3/plugin-ethereum";
+import { EthereumChildPlugin, Network } from "@kirby-web3/plugin-ethereum";
 import { RouteComponentProps } from "@reach/router";
 import { ViewPlugin } from "@kirby-web3/child-core";
 
-interface Web3EnableProps extends RouteComponentProps {
-  network?: string;
-}
-
-export const Web3Enable: React.FC<Web3EnableProps> = ({ network }) => {
+export const Web3Enable: React.FC<RouteComponentProps> = ({ location }) => {
   const ctx = React.useContext(CoreContext);
   const view = ctx.core.plugins.view as ViewPlugin;
   const hasInjectedWeb3 = (window as any).ethereum;
@@ -24,14 +20,18 @@ export const Web3Enable: React.FC<Web3EnableProps> = ({ network }) => {
 
   const requestID = useSelector((state: any) => {
     if (state.view && state.view.queue && state.view.queue[0]) {
-      return state.view.queue[0].requestID;
+      return state.view.queue[0].data.requestID;
     }
   });
 
+  const [network, providerPreference] = React.useMemo<[Network, string]>(() => {
+    const queryParams = queryString.parse(location!.search);
+    return [queryParams.network as Network, queryParams.providerPreference as string];
+  }, [location]);
+
   React.useEffect(() => {
-    const queryParams = queryString.parse(window.location.search);
-    if (queryParams.providerPreference) {
-      selection(queryParams.providerPreference as string).catch(err => console.log("error with selection", err));
+    if (providerPreference) {
+      selection(providerPreference as string).catch(err => console.log("error with selection", err));
     } else {
       setStatus("select");
     }
@@ -51,7 +51,7 @@ export const Web3Enable: React.FC<Web3EnableProps> = ({ network }) => {
     console.log("selected:", provider);
     try {
       setStatus("enabling provider");
-      await ethPlugin.enableWeb3(requestID, provider, network as any);
+      await ethPlugin.enableWeb3(requestID, provider, network);
       setStatus("done");
       (ctx.core.plugins.view as ViewPlugin).completeView();
     } catch (err) {

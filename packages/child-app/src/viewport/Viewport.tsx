@@ -7,7 +7,7 @@ import { SignatureConfirm } from "../views/SignatureConfirm";
 export const Viewport: React.FC = ({ children }) => {
   return (
     <Router>
-      <Web3Enable path="/ethereum/web3enable/:network" />
+      <Web3Enable path="/ethereum/web3enable" />
       <SignatureConfirm path="/ethereum/confirm-signature" />
     </Router>
   );
