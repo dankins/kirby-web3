@@ -1,6 +1,7 @@
 import React from "react";
 import { KirbyChildProvider, overrideTheme } from "@kirby-web3/child-react";
 import { EthereumChildPlugin, SignatureInterceptorPlugin } from "@kirby-web3/plugin-ethereum";
+import { buildTrustedWebChildPlugin } from "@kirby-web3/plugin-trustedweb";
 import { ConnextChildPlugin } from "@kirby-web3/plugin-connext";
 
 import { Viewport } from "./viewport/Viewport";
@@ -49,6 +50,7 @@ const plugins = [
       appID: process.env.REACT_APP_PORTIS_APP_ID!,
     },
   }),
+  buildTrustedWebChildPlugin(process.env.REACT_APP_ID_HUB_URL!),
 ];
 
 const App: React.FC = () => {

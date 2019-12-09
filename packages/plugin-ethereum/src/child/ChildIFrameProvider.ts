@@ -25,7 +25,7 @@ export class ChildIFrameProvider {
   public async handleIFrameMessage(req: any): Promise<void> {
     return new Promise((resolve, reject) => {
       this.logger("WEB3_REQUEST", req, this.provider);
-      req.method = this.provider.sendAsync ? "sendAsync" : "send";
+      // req.method = this.provider.sendAsync ? "sendAsync" : "send";
       this.provider[req.method](req.params, (err: any, data: any) => {
         this.logger("WEB3_REQUEST response", err, data);
         if (err) {
@@ -62,7 +62,7 @@ export class ChildIFrameProvider {
   }
 
   public async send(data: any, cb: any): Promise<any> {
-    return this.provider.sendAsync(data, cb);
+    return this.provider.send(data, cb);
   }
 
   public async sendBatch(methods: any[], moduleInstance: any): Promise<any[]> {

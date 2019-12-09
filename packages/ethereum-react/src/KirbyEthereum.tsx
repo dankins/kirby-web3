@@ -1,10 +1,11 @@
 import * as React from "react";
 import { KirbyProvider, Kirby, KirbyContext } from "@kirby-web3/parent-react";
 import { EthereumParentPlugin } from "@kirby-web3/plugin-ethereum";
+import { TrustedWebParentPlugin } from "@kirby-web3/plugin-trustedweb";
 
 export { useSelector as useKirbySelector } from "@kirby-web3/parent-react";
 
-const defaultPlugins = [new EthereumParentPlugin()];
+const defaultPlugins = [new EthereumParentPlugin(), new TrustedWebParentPlugin()];
 
 // @ts-ignore let the default value be null
 export const KirbyEthereumContext = React.createContext<KirbyEthereum>(null);
@@ -39,11 +40,12 @@ export const KirbyEthereumProvider: React.FunctionComponent<KirbyEthereumProvide
 export class KirbyEthereum {
   public kirby: Kirby;
   public ethereum: EthereumParentPlugin;
+  public trustedweb: TrustedWebParentPlugin;
   public web3: any;
   constructor(kirby: Kirby) {
     this.kirby = kirby;
     this.ethereum = kirby.plugins.ethereum as EthereumParentPlugin;
-    this.web3 = this.ethereum.web3;
+    this.trustedweb = kirby.plugins.trustedweb as TrustedWebParentPlugin;
   }
 
   public async getAccounts(): Promise<string[]> {
