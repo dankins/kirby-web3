@@ -114,6 +114,13 @@ export class HttpPersistence implements Persistence {
       },
     });
 
+    if (result.status === 404) {
+      throw new Error("key not found");
+    } else if (result.status !== 200) {
+      console.log("error getting data", result);
+      throw new Error("error getting data");
+    }
+
     const data = await result.json();
 
     console.log("auth data:", data);
