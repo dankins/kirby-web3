@@ -1,5 +1,5 @@
 import { MiddlewareAPI, Action, Dispatch } from "redux";
-import * as BurnerProvider from "burner-provider";
+import HDWalletProvider = require("@truffle/hdwallet-provider");
 import { ethers } from "ethers";
 
 import Web3 = require("web3");
@@ -151,22 +151,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       throw new Error("unrecognized provider: " + providerType);
     }
 
-    await this.provider.setConcreteProvider(concreteProvider);
-    const accounts = await this.web3.eth.getAccounts();
-    const networkID: number = await this.web3.eth.net.getId();
-    if (this.getState().ethereum.networkID !== networkID) {
-      this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_NETWORKCHANGED", payload: networkID } });
-    }
-    if (!this.getState().ethereum.accounts || this.getState().ethereum.accounts.join() !== accounts.join()) {
-      this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts } });
-    }
-
-    // set the providerType preference if necessary
-    const iframePlugin = this.dependencies.iframe;
-    const savedProviderType = iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE");
-    if (savedProviderType !== providerType) {
-      iframePlugin.setSitePreference("WEB3_PROVIDER_TYPE", providerType);
-    }
+    await this.setConcreteProvider(concreteProvider, providerType);
 
     return concreteProvider;
   }
@@ -178,6 +163,14 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
       this.logger("do not need to change network");
       this.dispatch({ type: PARENT_RESPONSE, requestID, payload: network });
     }
+  }
+
+  public async setPrivateKeyProvider(pk: string, network: Network): Promise<any> {
+    // const rpcUrl = this.getRPCUrl(this.getState().ethereum.network || this.config.defaultNetwork);
+    const rpcUrl = "https://rinkeby.infura.io/v3/06b8a36891d649ffa92950aeac5a7874";
+    const concreteProvider = new HDWalletProvider(pk, rpcUrl);
+    await this.setConcreteProvider(concreteProvider, ProviderTypes.BURNER);
+    return "ok";
   }
 
   public getBurnerProvider(network: Network): any {
@@ -195,7 +188,7 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     }
 
     const rpcUrl = this.getRPCUrl(network);
-    return new BurnerProvider({ rpcUrl, privateKey: pk });
+    return new HDWalletProvider(pk, rpcUrl);
   }
 
   public getRPCUrl(network: Network): string {
@@ -217,5 +210,24 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
   public cancelEnableWeb3(requestID: number): void {
     const iframePlugin = this.dependencies.iframe as ParentHandler;
     iframePlugin.reject(requestID, "cancelled");
+  }
+
+  private async setConcreteProvider(concreteProvider: any, providerType: ProviderTypes): Promise<void> {
+    await this.provider.setConcreteProvider(concreteProvider);
+    const accounts = await this.web3.eth.getAccounts();
+    const networkID: number = await this.web3.eth.net.getId();
+    if (this.getState().ethereum.networkID !== networkID) {
+      this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_NETWORKCHANGED", payload: networkID } });
+    }
+    if (!this.getState().ethereum.accounts || this.getState().ethereum.accounts.join() !== accounts.join()) {
+      this.dispatch({ type: SEND_TO_PARENT, payload: { type: "WEB3_ON_ACCOUNTSCHANGED", payload: accounts } });
+    }
+
+    // set the providerType preference if necessary
+    const iframePlugin = this.dependencies.iframe;
+    const savedProviderType = iframePlugin.getSitePreference("WEB3_PROVIDER_TYPE");
+    if (savedProviderType !== providerType) {
+      iframePlugin.setSitePreference("WEB3_PROVIDER_TYPE", providerType);
+    }
   }
 }

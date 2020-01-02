@@ -6,6 +6,7 @@
     "@kirby-web3/ethereum-react": "1.0.0",
     "@kirby-web3/plugin-connext": "^1.0.0",
     "@kirby-web3/plugin-ethereum": "^1.0.0",
+    "@kirby-web3/plugin-trustedweb": "^1.0.0",
     "@reach/router": "^1.2.1",
     "bootstrap": "^4.3.1",
     "ethereum-blockies-base64": "^1.0.2",

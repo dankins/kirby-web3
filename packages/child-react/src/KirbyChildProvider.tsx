@@ -22,6 +22,7 @@ export const CoreContext = React.createContext<ICoreContext>(startingContext);
 export const useStore = createStoreHook(CoreContext);
 export const useDispatch = createDispatchHook(CoreContext);
 export const useSelector = createSelectorHook(CoreContext);
+export const useKirbySelector = useSelector;
 
 export const KirbyChildProvider: React.FC<KirbyChildProviderProps> = ({ plugins, theme, children, config }) => {
   const [context, _] = React.useState<ICoreContext>(startingContext);
