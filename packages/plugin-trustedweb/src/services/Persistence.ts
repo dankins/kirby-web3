@@ -1,3 +1,6 @@
+import { setLocalKey, getLocalKey } from "@kirby-web3/common";
+
+const LOCAL_STORAGE_ENTROPY_KEY = "TRUSTED_WEB_ENTROPY";
 export interface EncryptedData {
   iv: string;
   cipherText: string;
@@ -19,12 +22,13 @@ export interface Persistence {
   // getData is used to store encrypted data by key
   getData(username: string, key: string): Promise<EncryptedData>;
 
-  // storeLocal(key: string, value: any): any;
-  // getLocal(key: string): any | undefined;
+  storeEntropyLocal(username: string, entropy: string): void;
+  getEntropyLocal(): { username: string; entropy: string } | undefined;
 }
 
 export interface HttpPersistenceConfig {
   baseURL: string;
+  disableLocalStorage?: boolean;
 }
 export class HttpPersistence implements Persistence {
   private config: HttpPersistenceConfig;
@@ -128,13 +132,15 @@ export class HttpPersistence implements Persistence {
     return data;
   }
 
-  // public storeLocal(key: string, value: any): any {
-  //   localStorage.setItem(key, )
-  // }
-  // public getLocal(key: string): any | undefined;
-  // public clearStorage(): {
-
-  // }
+  public storeEntropyLocal(username: string, entropy: string): void {
+    setLocalKey(LOCAL_STORAGE_ENTROPY_KEY, { username, entropy });
+  }
+  public getEntropyLocal(): { username: string; entropy: string } | undefined {
+    const result = getLocalKey(LOCAL_STORAGE_ENTROPY_KEY);
+    if (result) {
+      return result as { username: string; entropy: string };
+    }
+  }
 }
 
 export class InMemoryPersistence implements Persistence {
@@ -178,5 +184,15 @@ export class InMemoryPersistence implements Persistence {
       throw new Error("key not found");
     }
     return data;
+  }
+
+  public storeEntropyLocal(username: string, entropy: string): void {
+    setLocalKey(LOCAL_STORAGE_ENTROPY_KEY, { username, entropy });
+  }
+  public getEntropyLocal(): { username: string; entropy: string } | undefined {
+    const result = getLocalKey(LOCAL_STORAGE_ENTROPY_KEY);
+    if (result) {
+      return result as { username: string; entropy: string };
+    }
   }
 }

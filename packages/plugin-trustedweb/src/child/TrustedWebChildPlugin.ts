@@ -80,6 +80,10 @@ export class TrustedWebChildPlugin extends ChildPlugin<TrustedWebChildPluginConf
     }
 
     this.service = this.config.service!;
+    const truename = this.service.loadFromLocalStorage();
+    if (truename) {
+      await this.changeTruename(truename);
+    }
   }
 
   public middleware = (api: MiddlewareAPI<any>) => (next: Dispatch<any>) => <A extends Action>(action: any): void => {
@@ -118,23 +122,7 @@ export class TrustedWebChildPlugin extends ChildPlugin<TrustedWebChildPluginConf
 
   public async login(username: string, password: string): Promise<any> {
     const truename = await this.service.login(username, password);
-    this.truename = truename;
-    const action: TrustedWebChildLoginAction = {
-      type: TRUSTEDWEB_CHILD_LOGIN,
-      payload: {
-        currentUser: {
-          username: truename.username,
-        },
-      },
-    };
-    this.dispatch(action);
-    const profiles = await this.getProfiles();
-    const profilesAction: TrustedWebChildProfilesChangedAction = {
-      type: TRUSTEDWEB_CHILD_PROFILES_CHANGED,
-      // copying this object since it
-      payload: { profiles: profiles.concat([]) },
-    };
-    this.dispatch(profilesAction);
+    await this.changeTruename(truename);
     return truename;
   }
 
@@ -192,6 +180,26 @@ export class TrustedWebChildPlugin extends ChildPlugin<TrustedWebChildPluginConf
   public authenticate(requestID: number, result: AuthenticationResult): void {
     const iframePlugin = this.dependencies.iframe as ParentHandler;
     iframePlugin.respond(requestID, result);
+  }
+
+  private async changeTruename(truename: TrueName): Promise<void> {
+    this.truename = truename;
+    const action: TrustedWebChildLoginAction = {
+      type: TRUSTEDWEB_CHILD_LOGIN,
+      payload: {
+        currentUser: {
+          username: this.truename!.username,
+        },
+      },
+    };
+    this.dispatch(action);
+    const profiles = await this.getProfiles();
+    const profilesAction: TrustedWebChildProfilesChangedAction = {
+      type: TRUSTEDWEB_CHILD_PROFILES_CHANGED,
+      // copying this object since to get a new reference and make sure rerenders occur
+      payload: { profiles: profiles.concat([]) },
+    };
+    this.dispatch(profilesAction);
   }
 }
 

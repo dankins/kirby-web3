@@ -16,11 +16,20 @@ export class TrustedWebService {
     this.persistence = persistence;
   }
 
+  public loadFromLocalStorage(): TrueName | undefined {
+    const result = this.persistence.getEntropyLocal();
+
+    if (result) {
+      return new TrueName(result.username, result.entropy, this.persistence);
+    }
+  }
+
   public async createAccount(username: string, password: string, entropyOverride?: string): Promise<AccountResponse> {
     const wallet = await WalletManager.createWalletObj(password, entropyOverride);
     const authLookupKey = await WalletManager.createAuthLookupKey(username, password);
     await this.persistence.storeAuthLookupKey(authLookupKey, wallet.ivHex, wallet.cipherTextHex);
     await this.persistence.createUser(username);
+    this.persistence.storeEntropyLocal(username, wallet.entropy);
     return { username, wallet, authLookupKey, truename: new TrueName(username, wallet.entropy, this.persistence) };
   }
 
@@ -41,6 +50,7 @@ export class TrustedWebService {
     }
 
     const { entropy } = await WalletManager.decryptCipherTextAndRetrieveWallet(password, iv, cipherText);
+    this.persistence.storeEntropyLocal(username, entropy);
 
     return new TrueName(username, entropy, this.persistence);
   }
