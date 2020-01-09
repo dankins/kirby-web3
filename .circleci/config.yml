@@ -1,8 +1,8 @@
 version: 2
 
 defaults: &defaults
-  docker:
-    - image: circleci/node:10.16.0-stretch
+    docker:
+        - image: circleci/node:10.16.0-stretch
 
 jobs:
     build:
@@ -10,47 +10,48 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                name: Restore yarn cache
-                key: node-modules-{{ checksum "yarn.lock" }}
+                  name: Restore yarn cache
+                  key: node-modules-{{ checksum "yarn.lock" }}
             - run:
-                name: Install modules
-                command: yarn --frozen-lockfile install --ignore-engines
+                  name: Install modules
+                  command: yarn --frozen-lockfile install --ignore-engines
             - save_cache:
-                name: Save yarn cache
-                key: node-modules-{{ checksum "yarn.lock" }}
-                paths:
-                    - node_modules
+                  name: Save yarn cache
+                  key: node-modules-{{ checksum "yarn.lock" }}
+                  paths:
+                      - node_modules
             - run:
-                name: Building
-                environment:
-                    REACT_APP_IFRAME_SRC: https://kirbyweb3.com
-                    REACT_APP_TARGET_ORIGIN: https://kirbyweb3.com
-                command:  yarn build
+                  name: Building
+                  environment:
+                      REACT_APP_IFRAME_SRC: https://child.kirbyweb3.com
+                      REACT_APP_TARGET_ORIGIN: https://child.kirbyweb3.com
+                      REACT_APP_ID_HUB_URL: https://id-hub.ngrok.io/v1/hedgehog
+                  command: yarn build
             - run:
-                name: Ensuring prettified
-                command: yarn prettier
+                  name: Ensuring prettified
+                  command: yarn prettier
             - run:
-                name: Linting
-                command: yarn lint
+                  name: Linting
+                  command: yarn lint
             - run:
-                name: Running tests (except contracts)
-                command: |
-                    yarn test
+                  name: Running tests (except contracts)
+                  command: |
+                      yarn test
             - add_ssh_keys
             - run:
-                name: Releasing
-                command: |
-                    sudo npm install -g multi-semantic-release
-                    
-                    multi-semantic-release
+                  name: Releasing
+                  command: |
+                      sudo npm install -g multi-semantic-release
+
+                      multi-semantic-release
             - run:
-                name: Netlify - Child App
-                command: |
-                    if [ "$CIRCLE_BRANCH" = "master" ];  then yarn netlify:child-app; fi
+                  name: Netlify - Child App
+                  command: |
+                      if [ "$CIRCLE_BRANCH" = "master" ];  then yarn netlify:child-app; fi
             - run:
-                name: Netlify - Demo
-                command: |
-                    if [ "$CIRCLE_BRANCH" = "master" ];  then yarn netlify:demo; fi
+                  name: Netlify - Demo
+                  command: |
+                      if [ "$CIRCLE_BRANCH" = "master" ];  then yarn netlify:demo; fi
 
 workflows:
     version: 2
