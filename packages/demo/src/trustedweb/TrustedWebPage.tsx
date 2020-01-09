@@ -10,7 +10,7 @@ export const TrustedWebPage: React.FunctionComponent<RouteComponentProps> = () =
   const kirby = React.useContext<KirbyEthereum>(KirbyEthereumContext);
 
   async function authenticate(): Promise<void> {
-    const res = await kirby.trustedweb.authenticate();
+    const res = await kirby.trustedweb.requestAuthentication();
     alert(JSON.stringify(res));
   }
   return (

@@ -39,6 +39,8 @@ const plugins = [
     nodeUrl: "wss://rinkeby.indra.connext.network/api/messaging",
   }),
   new SignatureInterceptorPlugin({ autoSign: false }),
+  // make sure TrustedWeb plugin comes before Ethereum so that it can intercept web3 calls
+  buildTrustedWebChildPlugin(process.env.REACT_APP_ID_HUB_URL!, true),
   new EthereumChildPlugin({
     burnerPreference: "always",
     networks: {
@@ -50,7 +52,6 @@ const plugins = [
       appID: process.env.REACT_APP_PORTIS_APP_ID!,
     },
   }),
-  buildTrustedWebChildPlugin(process.env.REACT_APP_ID_HUB_URL!),
 ];
 
 const App: React.FC = () => {

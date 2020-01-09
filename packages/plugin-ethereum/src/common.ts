@@ -14,6 +14,7 @@ export enum ProviderTypes {
   PORTIS = "Portis",
   METAMASK = "MetaMask",
   READONLY = "Read Only",
+  TRUSTEDWEB = "TrustedWeb",
 }
 
 export type Network = "mainnet" | "rinkeby" | "ropsten";

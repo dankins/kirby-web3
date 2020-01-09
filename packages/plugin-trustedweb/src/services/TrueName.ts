@@ -1,5 +1,5 @@
 import { Authentication, etherjsWallet } from "@audius/hedgehog";
-import { Persistence } from "./Persistence";
+import { Persistence } from "./persistence/Persistence";
 
 // default path for ethereum, but missing the last `/0` (since the account will be appended in the createWalllet method)
 const DEFAULT_PATH = "m/44'/60'/0'/0";
@@ -47,12 +47,12 @@ export class TrueName {
     try {
       const encryptedProfiles = await this.persistence.getData(this.username, "profiles");
       this.profiles = this.deserializeProfiles(encryptedProfiles.iv, encryptedProfiles.cipherText);
-      console.log("loaded profiles", this.profiles);
       return;
     } catch (err) {
       if (err.message === "key not found") {
         this.profiles = [];
       } else {
+        console.log("error loading profiles");
         throw err;
       }
     }
@@ -68,10 +68,10 @@ export class TrueName {
   public async saveProfiles(): Promise<void> {
     const data = this.serializeProfiles();
     const encryptedProfiles = await this.persistence.storeData(this.username, "profiles", data.iv, data.cipherText);
-    console.log("saveProfiles success", encryptedProfiles);
   }
 
   public async createProfile(name: string): Promise<Profile> {
+    console.log("creating profiles", this.profiles);
     if (!this.profiles) {
       await this.loadProfiles();
     }
@@ -80,8 +80,10 @@ export class TrueName {
     this.profiles![profile.index] = profile;
 
     const serialized = this.serializeProfiles();
+    console.log("serialized", serialized, profile, this.profiles);
     await this.persistence.storeData(this.username, "profiles", serialized.iv, serialized.cipherText);
 
+    console.log("stored", this.profiles, profile);
     return profile;
   }
 

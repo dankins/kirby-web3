@@ -165,11 +165,17 @@ export class EthereumChildPlugin extends ChildPlugin<EthereumChildPluginConfig> 
     }
   }
 
-  public async setPrivateKeyProvider(pk: string, network: Network): Promise<any> {
-    // const rpcUrl = this.getRPCUrl(this.getState().ethereum.network || this.config.defaultNetwork);
-    const rpcUrl = "https://rinkeby.infura.io/v3/06b8a36891d649ffa92950aeac5a7874";
-    const concreteProvider = new HDWalletProvider(pk, rpcUrl);
-    await this.setConcreteProvider(concreteProvider, ProviderTypes.BURNER);
+  public async setPrivateKeyProvider(pk: string, network: Network, providerType: ProviderTypes): Promise<any> {
+    let readOnlyProvider;
+    const readOnlyRPCUrl = this.getRPCUrl(network);
+    if (readOnlyRPCUrl.startsWith("ws")) {
+      readOnlyProvider = new WebWsProvider(readOnlyRPCUrl);
+    } else {
+      readOnlyProvider = new Web3HttpProvider(readOnlyRPCUrl);
+    }
+
+    const concreteProvider = new HDWalletProvider(pk, readOnlyProvider);
+    await this.setConcreteProvider(concreteProvider, providerType);
     return "ok";
   }
 

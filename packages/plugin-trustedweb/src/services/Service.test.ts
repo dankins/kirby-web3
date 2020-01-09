@@ -1,5 +1,5 @@
 import { TrustedWebService } from "./Service";
-import { InMemoryPersistence } from "./Persistence";
+import { InMemoryPersistence } from "./persistence/InMemoryPersistence";
 
 const USERNAME = "__test__";
 const PASSWORD = "__test__";

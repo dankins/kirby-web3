@@ -45,6 +45,7 @@ export class KirbyEthereum {
   constructor(kirby: Kirby) {
     this.kirby = kirby;
     this.ethereum = kirby.plugins.ethereum as EthereumParentPlugin;
+    this.web3 = this.ethereum.web3;
     this.trustedweb = kirby.plugins.trustedweb as TrustedWebParentPlugin;
   }
 

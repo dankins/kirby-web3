@@ -2,7 +2,7 @@ import Cookies = require("js-cookie");
 
 const canUseLocalStorage = localStorageAvailable();
 
-export function setLocalKey(storageKey: string, value: object) {
+export function setLocalKey(storageKey: string, value: Object) {
   const storageValue = JSON.stringify(value);
   if (canUseLocalStorage) {
     window.localStorage.setItem(storageKey, storageValue);
@@ -16,7 +16,7 @@ export function setLocalKey(storageKey: string, value: object) {
   }
 }
 
-export function getLocalKey(storageKey: string): object | undefined {
+export function getLocalKey(storageKey: string): any | undefined {
   let rtn = null;
   if (canUseLocalStorage) {
     rtn = window.localStorage.getItem(storageKey);
@@ -33,6 +33,15 @@ export function getLocalKey(storageKey: string): object | undefined {
   } catch (err) {
     console.error("error loading value from storage", rtn);
     return undefined;
+  }
+}
+
+export function deleteLocalKey(storageKey: string): void {
+  if (canUseLocalStorage) {
+    window.localStorage.removeItem(storageKey);
+  } else {
+    // fallback to using a cookie
+    Cookies.remove(storageKey);
   }
 }
 

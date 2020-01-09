@@ -102,7 +102,7 @@ export class ParentHandler extends ChildPlugin<Config, ParentHandlerState, Paren
       } else {
         this.dispatch({
           type: PARENT_MESSAGE,
-          payload: message.data,
+          payload: message.data.request,
         });
       }
     }
