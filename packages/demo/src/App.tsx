@@ -24,6 +24,8 @@ const config = {
   },
 };
 
+console.log("loading app", config);
+
 const plugins = [new ConnextParentPlugin()];
 
 const App: React.FC = () => {
