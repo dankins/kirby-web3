@@ -26,6 +26,7 @@ declare module "@audius/hedgehog" {
     static async decryptCipherTextAndRetrieveWallet(password, ivHex, cipherTextHex);
   }
   export class Authentication {
+    static generateMnemonicAndEntropy(): { entropy: any };
     static generateWalletFromEntropy(entropy, path): etherjsWallet;
     static encrypt(entropy, ivBuffer, keyBuffer): { cipherText: ArrayBuffer; cipherTextHex: string };
     static createIV(): { ivHex: string; ivBuffer: Uint8Array };

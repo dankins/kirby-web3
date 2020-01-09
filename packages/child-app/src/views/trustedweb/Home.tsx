@@ -3,21 +3,14 @@ import { CoreContext, CenteredPage, useKirbySelector } from "@kirby-web3/child-r
 import { RouteComponentProps } from "@reach/router";
 import { ViewPlugin } from "@kirby-web3/child-core";
 import { TrustedWebChildPlugin, Profile, CurrentUser } from "@kirby-web3/plugin-trustedweb";
-import { Signup } from "./trustedweb/Signup";
-import { Login } from "./trustedweb/Login";
-import { SelectProfile } from "./trustedweb/SelectProfile";
-import { ProfileHeader } from "./trustedweb/ProfileHeader";
+import { ProfileHeader } from "./ProfileHeader";
+import { SelectProfile } from "./SelectProfile";
+import { EphemeralUpgrade } from "./EphemeralUpgrade";
 
-export const Authenticate: React.FC<RouteComponentProps> = ({ location }) => {
+export const Home: React.FC<RouteComponentProps> = ({ location }) => {
   const ctx = React.useContext(CoreContext);
   const trustedweb = ctx.core.plugins.trustedweb as TrustedWebChildPlugin;
   const viewPlugin = ctx.core.plugins.view as ViewPlugin;
-
-  const requestID = useKirbySelector((state: any) => {
-    if (state.view && state.view.queue && state.view.queue[0]) {
-      return state.view.queue[0].data.requestID;
-    }
-  });
 
   const profiles: Profile[] = useKirbySelector((state: any) => {
     if (!state.trustedweb.currentUser) {
@@ -31,28 +24,19 @@ export const Authenticate: React.FC<RouteComponentProps> = ({ location }) => {
   const [view, setView] = React.useState("login");
 
   React.useEffect(() => {
-    if (requestID) {
-      viewPlugin.onParentClick(() => {
-        trustedweb.cancelAuthenticate(requestID);
-        viewPlugin.completeView();
-      });
-    }
-  }, [ctx, requestID, viewPlugin, trustedweb]);
+    viewPlugin.onParentClick(() => {
+      viewPlugin.completeView();
+    });
+  }, [ctx, viewPlugin, trustedweb]);
+
+  async function onProfileSelected(selectedProfile: Profile): Promise<Profile> {
+    await trustedweb.changeProfile(selectedProfile);
+    setView("default");
+    return selectedProfile;
+  }
 
   if (!currentUser) {
-    if (view === "login") {
-      return (
-        <CenteredPage>
-          <Login plugin={trustedweb} goToSignup={() => setView("signup")} />
-        </CenteredPage>
-      );
-    } else {
-      return (
-        <CenteredPage>
-          <Signup plugin={trustedweb} goToLogin={() => setView("login")} />
-        </CenteredPage>
-      );
-    }
+    return <CenteredPage>account not unlocked</CenteredPage>;
   }
 
   if (!currentUser.selectedProfile || view === "profiles") {
@@ -67,16 +51,15 @@ export const Authenticate: React.FC<RouteComponentProps> = ({ location }) => {
     );
   }
 
-  async function onProfileSelected(selectedProfile: Profile): Promise<Profile> {
-    await trustedweb.changeProfile(selectedProfile);
-    setView("default");
-    viewPlugin.completeView();
-    return selectedProfile;
+  function logout(): void {
+    trustedweb.logout();
   }
 
   return (
     <CenteredPage>
       <ProfileHeader profile={currentUser!.selectedProfile} onProfileChangeRequest={() => setView("profiles")} />
+      {currentUser && currentUser.ephemeral ? <EphemeralUpgrade /> : undefined}
+      {currentUser ? <button onClick={logout}>Logout</button> : undefined}
     </CenteredPage>
   );
 };

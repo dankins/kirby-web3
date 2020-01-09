@@ -1,4 +1,4 @@
-import { InMemoryPersistence } from "./Persistence";
+import { InMemoryPersistence } from "./persistence/InMemoryPersistence";
 import { TrueName } from "./TrueName";
 import { Authentication } from "@audius/hedgehog";
 

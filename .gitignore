@@ -68,3 +68,5 @@ build/
 
 coverage/
 coverage.json
+
+packages/plugin-trustedweb/local-storage/hedgehog-entropy-key
