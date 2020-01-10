@@ -11,7 +11,7 @@ export const Viewport: React.FC = ({ children }) => {
     <Router>
       <Web3Enable path="/ethereum/web3enable" />
       <SignatureConfirm path="/ethereum/confirm-signature" />
-      <Authenticate path="/trustedweb/authenticate" />
+      <Home path="/trustedweb/authenticate" />
       <Home path="/trustedweb/home" />
     </Router>
   );

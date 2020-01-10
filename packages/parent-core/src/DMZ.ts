@@ -204,7 +204,6 @@ export class DMZ extends ParentPlugin<DMZConfig, any, DMZMessageType> {
       this.startQueue.push(msg);
     } else {
       this.logger(`sending message to child iframe`, msg);
-      console.log("send it ", msg);
       this.iframe!.postMessage(msg, this.config.targetOrigin);
     }
   }

@@ -1,7 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
 import makeBlockie from "ethereum-blockies-base64";
-import { Profile } from "@kirby-web3/plugin-trustedweb";
+import { Profile, CurrentUser, TrustedWebChildPlugin } from "@kirby-web3/plugin-trustedweb";
+import { Button, LinkButton } from "../../common/Button";
+import { useKirbySelector, CoreContext } from "@kirby-web3/child-react";
 
 const ProfileHeaderContainer = styled.div`
   width: 100%;
@@ -34,9 +36,17 @@ export interface ProfileHeaderProps {
 }
 
 export const ProfileHeader: React.FunctionComponent<ProfileHeaderProps> = ({ profile, onProfileChangeRequest }) => {
+  const ctx = React.useContext(CoreContext);
+  const trustedweb = ctx.core.plugins.trustedweb as TrustedWebChildPlugin;
+  const currentUser: CurrentUser | undefined = useKirbySelector((state: any) => state.trustedweb.currentUser);
+
   const blockie = React.useMemo(() => {
     return makeBlockie(profile.address);
   }, [profile]);
+
+  function logout(): void {
+    trustedweb.logout();
+  }
 
   return (
     <ProfileHeaderContainer>
@@ -45,7 +55,10 @@ export const ProfileHeader: React.FunctionComponent<ProfileHeaderProps> = ({ pro
         <small>Selected Profile</small>
         <span>{profile.name}</span>
       </div>
-      <button onClick={onProfileChangeRequest}>change</button>
+      <div>
+        <Button onClick={onProfileChangeRequest}>Change</Button>
+        {currentUser ? <LinkButton onClick={logout}>Logout</LinkButton> : undefined}
+      </div>
     </ProfileHeaderContainer>
   );
 };

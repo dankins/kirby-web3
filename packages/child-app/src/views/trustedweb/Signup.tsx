@@ -26,7 +26,7 @@ export const Signup: React.FunctionComponent<SignupProps> = ({ plugin, goToLogin
 
   return (
     <Container>
-      <div>Create a trusted web account so you can authenticate with </div>
+      <div>Enter your username and password so you can log in across devices:</div>
       <AccountForm cta="Sign Up" checkPassword={onSubmit} onSuccess={onSuccess} />
       <div>
         Already have an account? <LinkButton onClick={goToLogin}>Click to log in</LinkButton>

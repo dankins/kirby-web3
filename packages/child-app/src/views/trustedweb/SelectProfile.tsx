@@ -3,7 +3,7 @@ import styled from "styled-components";
 import makeBlockie from "ethereum-blockies-base64";
 
 import { Profile } from "@kirby-web3/plugin-trustedweb";
-import { Button } from "../../common/Button";
+import { Button, buttonSizes } from "../../common/Button";
 
 export interface SelectProfileProps {
   profiles: Profile[];
@@ -61,13 +61,17 @@ export const SelectProfile: React.FunctionComponent<SelectProfileProps> = ({
         <div>you don't have any profiles yet</div>
         <div>enter your profile name:</div>
         <input type="text" ref={nameRef} />
-        <button onClick={doCreateProfile}>Create Profile</button>
+        <Button onClick={doCreateProfile} size={buttonSizes.SMALL}>
+          Create Profile
+        </Button>
       </div>
     );
   }
   return (
     <div>
-      <div>Select Profile to Use</div>
+      <div>
+        <strong>Select Profile</strong>
+      </div>
       {profiles.map((profile, idx) => (
         <ProfileItem
           key={profile.address}
@@ -77,9 +81,13 @@ export const SelectProfile: React.FunctionComponent<SelectProfileProps> = ({
         />
       ))}
       <div>
-        <div>or create a new profile:</div>
+        <div>
+          <small>or create a new profile:</small>
+        </div>
         <input type="text" ref={nameRef} />
-        <button onClick={doCreateProfile}>Create Profile</button>
+        <Button onClick={doCreateProfile} size={buttonSizes.SMALL}>
+          Create Profile
+        </Button>
       </div>
     </div>
   );
@@ -111,7 +119,9 @@ export const ProfileItem: React.FunctionComponent<ProfileItemProps> = ({ profile
     <ProfileItemContainer>
       <img src={blockie} height={35} width={35} alt={profile.address} />
       <span>{profile.name}</span>
-      <Button onClick={onSelect}>select</Button>
+      <Button onClick={onSelect} size={buttonSizes.SMALL}>
+        Select
+      </Button>
     </ProfileItemContainer>
   );
 };

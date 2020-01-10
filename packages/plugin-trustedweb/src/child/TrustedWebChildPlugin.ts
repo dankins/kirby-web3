@@ -302,6 +302,12 @@ export class TrustedWebChildPlugin extends ChildPlugin<TrustedWebChildPluginConf
     const iframePlugin = this.dependencies.iframe as ParentHandler;
     iframePlugin.sendToParent({ type: SEND_TO_PARENT, payload: { type: TRUSTEDWEB_LOGOUT, payload: {} } });
   }
+  public getEntropy(): string {
+    if (!this.truename) {
+      throw new Error("truename not loaded");
+    }
+    return this.truename.entropy;
+  }
 
   private async changeTruename(truename: TrueName, ephemeral: boolean = false): Promise<void> {
     this.truename = truename;
