@@ -140,7 +140,19 @@ export class TrustedWebChildPlugin extends ChildPlugin<TrustedWebChildPluginConf
         console.log("intercepting web3 enable", action, this.profiles);
         const requestID = action.requestID;
         const ethereumPlugin = this.dependencies.ethereum as EthereumChildPlugin;
-        this.activateWeb3Provider(this.profiles![0], ethereumPlugin.config.defaultNetwork)
+        const pluginState = api.getState().trustedweb as TrustedWebChildPluginState;
+
+        // if there is no selected profile
+        if (!pluginState.currentUser || !pluginState.currentUser.selectedProfile) {
+          console.log("attempting to activate web3 but no selected profile", pluginState.currentUser);
+          viewPlugin.requestView("/trustedweb/select-profile", {
+            network: api.getState().ethereum.network,
+            requestID: action.requestID,
+          });
+          return;
+        }
+
+        this.activateWeb3Provider(pluginState.currentUser.selectedProfile, ethereumPlugin.config.defaultNetwork)
           .then(result => {
             this.dispatch({
               type: PARENT_RESPONSE,
