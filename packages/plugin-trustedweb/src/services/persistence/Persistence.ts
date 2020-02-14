@@ -15,9 +15,11 @@ export interface Persistence {
   // otherwise the same username+password could be used with different ivs
   createUser(username: string): Promise<boolean>;
   // storeData is used to store a list of profiles so we can rehydrate them upon loading the wallet
-  storeData(username: string, key: string, iv: string, cipherText: string): Promise<boolean>;
+  // if salt parameter is provided the key persisted will be hash(concat(key,salt))
+  storeData(username: string, key: string, iv: string, cipherText: string, salt?: string): Promise<boolean>;
   // getData is used to store encrypted data by key
-  getData(username: string, key: string): Promise<EncryptedData>;
+  // if the salt parameter is provided the lookup key queried will be hash(concat(key,salt))
+  getData(username: string, key: string, salt?: string): Promise<EncryptedData>;
 
   storeEntropyLocal(username: string, entropy: string): void;
   getEntropyLocal(): { username: string; entropy: string } | undefined;
