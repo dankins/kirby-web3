@@ -1,3 +1,4 @@
+import sha256 = require("crypto-js/sha256");
 import { setLocalKey, getLocalKey, deleteLocalKey } from "@kirby-web3/common";
 
 import { Persistence, EncryptedData } from "./Persistence";
@@ -66,8 +67,15 @@ export class HttpPersistence implements Persistence {
     return true;
   }
   // storeData is used to store a list of profiles so we can rehydrate them upon loading the wallet
-  public async storeData(username: string, key: string, iv: string, cipherText: string): Promise<boolean> {
-    const result = await fetch(`${this.config.baseURL}/users/${encodeURI(username)}/store/${encodeURI(key)}`, {
+  public async storeData(
+    username: string,
+    key: string,
+    iv: string,
+    cipherText: string,
+    salt?: string,
+  ): Promise<boolean> {
+    const encodedKey = this.prepareKey(key, salt);
+    const result = await fetch(`${this.config.baseURL}/users/${encodeURI(username)}/store/${encodedKey}`, {
       method: "POST",
       body: JSON.stringify({ iv, cipherText }),
       headers: {
@@ -84,8 +92,9 @@ export class HttpPersistence implements Persistence {
 
   // encrypt `username::password` using the hardcoded IV, and use that as a key
   // to locate the ciphertext containing the user's entropy / seed phrase
-  public async getData(username: string, key: string): Promise<EncryptedData> {
-    const result = await fetch(`${this.config.baseURL}/users/${encodeURI(username)}/store/${encodeURI(key)}`, {
+  public async getData(username: string, key: string, salt?: string): Promise<EncryptedData> {
+    const encodedKey = this.prepareKey(key, salt);
+    const result = await fetch(`${this.config.baseURL}/users/${encodeURI(username)}/store/${encodedKey}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -119,5 +128,9 @@ export class HttpPersistence implements Persistence {
   }
   public isEphemeral(): boolean {
     return false;
+  }
+
+  private prepareKey(key: string, salt?: string): string {
+    return salt ? sha256(`${key}${salt}`).toString() : encodeURI(key);
   }
 }

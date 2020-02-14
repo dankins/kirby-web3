@@ -45,7 +45,7 @@ export class TrueName {
 
   public async loadProfiles(): Promise<void> {
     try {
-      const encryptedProfiles = await this.persistence.getData(this.username, "profiles");
+      const encryptedProfiles = await this.persistence.getData(this.username, "profiles", this.entropy);
       this.profiles = this.deserializeProfiles(encryptedProfiles.iv, encryptedProfiles.cipherText);
       return;
     } catch (err) {
@@ -67,7 +67,13 @@ export class TrueName {
 
   public async saveProfiles(): Promise<void> {
     const data = this.serializeProfiles();
-    const encryptedProfiles = await this.persistence.storeData(this.username, "profiles", data.iv, data.cipherText);
+    const encryptedProfiles = await this.persistence.storeData(
+      this.username,
+      "profiles",
+      data.iv,
+      data.cipherText,
+      this.entropy,
+    );
   }
 
   public async createProfile(name: string): Promise<Profile> {
@@ -79,11 +85,8 @@ export class TrueName {
     const profile = this.loadProfile(nextIndex, name);
     this.profiles![profile.index] = profile;
 
-    const serialized = this.serializeProfiles();
-    console.log("serialized", serialized, profile, this.profiles);
-    await this.persistence.storeData(this.username, "profiles", serialized.iv, serialized.cipherText);
+    await this.saveProfiles();
 
-    console.log("stored", this.profiles, profile);
     return profile;
   }
 

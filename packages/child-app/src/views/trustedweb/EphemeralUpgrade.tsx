@@ -42,7 +42,7 @@ export const EphemeralUpgrade: React.FC = () => {
                 creating your account:
               </div>
             </div>
-            <Button onClick={() => setView("upgrade")}>Create Account</Button>
+            <Button onClick={() => setView("upgrade")}>Finish</Button>
             <LinkButton onClick={() => setView("login")}>I already have an account</LinkButton>
           </div>
         </Container>
